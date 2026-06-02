@@ -53,3 +53,10 @@ dkms.conf
 
 # debug information files
 *.dwo
+
+# Additions
+*.swp
+a.out
+minishell
+.vscode/
+.DS_Store/
