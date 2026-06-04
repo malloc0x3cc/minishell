@@ -6,7 +6,7 @@
 #    By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/06/04 12:58:29 by madelwau          #+#    #+#              #
-#    Updated: 2026/06/04 12:59:59 by madelwau         ###   ########.fr        #
+#    Updated: 2026/06/04 23:54:30 by madelwau         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,17 +20,10 @@ CFLAGS	= -Wall -Wextra -Werror -I. -MMD -MP
 LFT_DIR	= libft
 LFT		= $(LFT_DIR)/libft.a
 
+LIBS	= -L$(LFT_DIR) -lft -lreadline
+
 SRCS	= minishell.c
 MODE	= mandatory
-# ifeq ($(filter bonus,$(MAKECMDGOALS)),bonus)
-# 	SRCS_S	= server_bonus.c
-# 	SRCS_C	= client_bonus.c
-# 	MODE	= bonus
-# else
-# 	MODE	= mandatory
-# endif
-
-# bonus: all
 
 OBJ_DIR	= .obj/
 OBJS	= $(addprefix $(OBJ_DIR), $(SRCS:.c=.o))
