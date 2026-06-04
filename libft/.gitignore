@@ -1,0 +1,13 @@
+*.swp
+*.o
+libft.a
+libftTester/
+printfTester/
+gnlTester/
+libft-war-machine
+.vscode/
+.DS_Store
+a.out
+main.c
+*.d
+.obj/

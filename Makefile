@@ -1,0 +1,73 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2026/06/04 12:58:29 by madelwau          #+#    #+#              #
+#    Updated: 2026/06/04 12:59:59 by madelwau         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
+SHELL =	/bin/sh
+
+NAME	= minishell
+
+CC		= cc
+CFLAGS	= -Wall -Wextra -Werror -I. -MMD -MP
+
+LFT_DIR	= libft
+LFT		= $(LFT_DIR)/libft.a
+
+SRCS	= minishell.c
+MODE	= mandatory
+# ifeq ($(filter bonus,$(MAKECMDGOALS)),bonus)
+# 	SRCS_S	= server_bonus.c
+# 	SRCS_C	= client_bonus.c
+# 	MODE	= bonus
+# else
+# 	MODE	= mandatory
+# endif
+
+# bonus: all
+
+OBJ_DIR	= .obj/
+OBJS	= $(addprefix $(OBJ_DIR), $(SRCS:.c=.o))
+DEPS	= $(addprefix $(OBJ_DIR), $(SRCS:.c=.d))
+
+all: $(NAME)
+
+$(LFT):
+	@$(MAKE) -C $(LFT_DIR)
+
+$(NAME): $(LFT) $(OBJS)
+	@$(CC) $(CFLAGS) $(OBJS) $(LIBS) -o $(NAME)
+	@printf "$(COL_Y)[DONE] $(NAME) ($(MODE))$(COL_0)\n"
+
+$(OBJ_DIR)%.o: %.c
+	@mkdir -p $(dir $@)
+	@$(CC) $(CFLAGS) -I$(LFT_DIR) -I. -c $< -o $@
+	@printf "$(COL_G)[OK]$(COL_0) %s -> %s\n" "$<" "$@"
+
+clean:
+	@$(MAKE) clean -C $(LFT_DIR)
+	@rm -rf $(OBJ_DIR)
+	@printf "$(COL_R)[RM]$(COL_0) $(shell basename $(CURDIR))/$(OBJ_DIR)\n"
+
+fclean: clean
+	@$(MAKE) fclean -C $(LFT_DIR)
+	@rm -f $(NAME)
+	@printf "$(COL_R)[RM]$(COL_0) $(COL_B)$(NAME)$(COL_0)\n"
+
+re: fclean all
+
+.PHONY: all clean fclean re
+-include $(DEPS)
+
+# Colors
+COL_R	= \033[1;31m
+COL_G	= \033[1;32m
+COL_B	= \033[1;34m
+COL_Y	= \033[1;33m
+COL_0	= \033[0m
