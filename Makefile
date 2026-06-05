@@ -6,28 +6,28 @@
 #    By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/06/04 12:58:29 by madelwau          #+#    #+#              #
-#    Updated: 2026/06/04 23:54:30 by madelwau         ###   ########.fr        #
+#    Updated: 2026/06/05 02:13:11 by madelwau         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SHELL =	/bin/sh
+SHELL	:=	/bin/sh
 
-NAME	= minishell
+NAME	:= $(strip minishell)
 
-CC		= cc
-CFLAGS	= -Wall -Wextra -Werror -I. -MMD -MP
+CC		:= cc
+CFLAGS	:= -Wall -Wextra -Werror -I. -MMD -MP
 
-LFT_DIR	= libft
-LFT		= $(LFT_DIR)/libft.a
+LFT_DIR	:= libft
+LFT		:= $(LFT_DIR)/libft.a
 
-LIBS	= -L$(LFT_DIR) -lft -lreadline
+LIBS	:= -L$(LFT_DIR) -lft -lreadline
 
-SRCS	= minishell.c
-MODE	= mandatory
+SRCS	:= minishell.c
+MODE	:= mandatory
 
-OBJ_DIR	= .obj/
-OBJS	= $(addprefix $(OBJ_DIR), $(SRCS:.c=.o))
-DEPS	= $(addprefix $(OBJ_DIR), $(SRCS:.c=.d))
+OBJ_DIR	:= .obj/
+OBJS	:= $(addprefix $(OBJ_DIR), $(SRCS:.c=.o))
+DEPS	:= $(addprefix $(OBJ_DIR), $(SRCS:.c=.d))
 
 all: $(NAME)
 
@@ -36,7 +36,7 @@ $(LFT):
 
 $(NAME): $(LFT) $(OBJS)
 	@$(CC) $(CFLAGS) $(OBJS) $(LIBS) -o $(NAME)
-	@printf "$(COL_Y)[DONE] $(NAME) ($(MODE))$(COL_0)\n"
+	@printf '$(COL_Y)[DONE] %s ($(MODE))$(COL_0)\n' "$(NAME)"
 
 $(OBJ_DIR)%.o: %.c
 	@mkdir -p $(dir $@)
@@ -44,14 +44,13 @@ $(OBJ_DIR)%.o: %.c
 	@printf "$(COL_G)[OK]$(COL_0) %s -> %s\n" "$<" "$@"
 
 clean:
-	@$(MAKE) clean -C $(LFT_DIR)
 	@rm -rf $(OBJ_DIR)
-	@printf "$(COL_R)[RM]$(COL_0) $(shell basename $(CURDIR))/$(OBJ_DIR)\n"
+	@printf "$(COL_R)[RM]$(COL_0) %s/%s\n" "$(shell basename $(CURDIR))" "$(OBJ_DIR)"
 
 fclean: clean
 	@$(MAKE) fclean -C $(LFT_DIR)
 	@rm -f $(NAME)
-	@printf "$(COL_R)[RM]$(COL_0) $(COL_B)$(NAME)$(COL_0)\n"
+	@printf "$(COL_R)[RM]$(COL_0) $(COL_B)%s$(COL_0)\n" "$(NAME)"
 
 re: fclean all
 
@@ -59,8 +58,8 @@ re: fclean all
 -include $(DEPS)
 
 # Colors
-COL_R	= \033[1;31m
-COL_G	= \033[1;32m
-COL_B	= \033[1;34m
-COL_Y	= \033[1;33m
-COL_0	= \033[0m
+COL_R	:= \033[1;31m
+COL_G	:= \033[1;32m
+COL_B	:= \033[1;34m
+COL_Y	:= \033[1;33m
+COL_0	:= \033[0m
