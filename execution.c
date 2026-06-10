@@ -1,46 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   minishell.c                                        :+:      :+:    :+:   */
+/*   execution.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: gahubert <gahubert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/06/04 13:00:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/06/09 18:54:58 by gahubert         ###   ########.fr       */
+/*   Created: 2026/06/09 16:01:26 by gahubert          #+#    #+#             */
+/*   Updated: 2026/06/09 18:51:38 by gahubert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static void	free_all(char **arr)
+void	execute(/*int infile, */ char **args)
 {
-	int i;
+	pid_t	pid[3];
+	int		i;
 
 	i = 0;
-	while (arr[i])
-		free(arr[i++]);
-	free(arr);
-}
-
-int	main(void)
-{
-	char	*input;
-	char	**argv;
-
-	while (1)
+	while (args[i])
 	{
-		input = readline(PROMPT);
-		if (!input)
-			break ;
-		if (*input)
+		pid[i] = fork();
+		if (pid[i] == -1)
+			return ;
+		if (pid[i] == 0)
 		{
-			add_history(input);
-			argv = ft_split(input, ' ');
-			execute(argv);
+			printf("Pid : %d Arg : %s\n", pid[i], args[i]);
 		}
-		free(input);
-		free_all(argv);
+		i++;
 	}
-	rl_clear_history();
-	return (0);
 }
