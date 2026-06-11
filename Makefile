@@ -6,7 +6,7 @@
 #    By: gahubert <gahubert@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/06/04 12:58:29 by madelwau          #+#    #+#              #
-#    Updated: 2026/06/09 16:05:42 by gahubert         ###   ########.fr        #
+#    Updated: 2026/06/11 13:05:06 by gahubert         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,7 +22,7 @@ LFT		:= $(LFT_DIR)/libft.a
 
 LIBS	:= -L$(LFT_DIR) -lft -lreadline
 
-SRCS	:= minishell.c execution.c
+SRCS	:= minishell.c execution.c error_handling.c
 MODE	:= mandatory
 
 OBJ_DIR	:= .obj/

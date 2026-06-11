@@ -1,46 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   minishell.c                                        :+:      :+:    :+:   */
+/*   error_handling.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: gahubert <gahubert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/06/04 13:00:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/06/11 12:47:37 by gahubert         ###   ########.fr       */
+/*   Created: 2026/06/11 13:02:57 by gahubert          #+#    #+#             */
+/*   Updated: 2026/06/11 13:04:53 by gahubert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static void	free_all(char **arr)
+int	wait_children(pid_t pid, int *status)
 {
-	int i;
-
-	i = 0;
-	while (arr[i])
-		free(arr[i++]);
-	free(arr);
-}
-
-int	main(void)
-{
-	char	*input;
-	char	**argv;
-
-	while (1)
+	if (waitpid(pid, status, 0) == -1)
 	{
-		input = readline(PROMPT);
-		if (!input)
-			break ;
-		if (*input)
-		{
-			add_history(input);
-			argv = ft_split(input, ' ');
-			execute(argv);
-			free(input);
-			free_all(argv);
-		}
+		perror("error");
+		return (0);
 	}
-	rl_clear_history();
-	return (0);
+	return (1);
 }

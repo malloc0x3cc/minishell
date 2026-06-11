@@ -6,7 +6,7 @@
 /*   By: gahubert <gahubert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:01:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/06/09 18:16:21 by gahubert         ###   ########.fr       */
+/*   Updated: 2026/06/11 13:06:54 by gahubert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 # include "libft/inc/libft.h"
+# include <sys/wait.h>
 
 # define PROMPT "minishell> "
 
@@ -37,6 +38,7 @@ typedef struct s_token
 	struct s_token	*next;
 }	t_token;
 
-void execute(char **args);
+int	execute(char **args);
+int	wait_children(pid_t pid, int *status);
 
 #endif
