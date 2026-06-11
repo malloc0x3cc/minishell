@@ -6,30 +6,30 @@
 /*   By: gahubert <gahubert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 16:01:26 by gahubert          #+#    #+#             */
-/*   Updated: 2026/06/11 13:07:30 by gahubert         ###   ########.fr       */
+/*   Updated: 2026/06/11 16:43:25 by gahubert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	execute(/*int infile, */ char **args)
+int	execute(char **scmd)
 {
-	pid_t	pid[9999];
+	pid_t	pid;
 	int		i;
 	int		status;
 
 	i = 0;
-	while (args[i])
+	while (scmd[i])
 	{
-		pid[i] = fork();
-		if (pid[i] == -1)
+		pid = fork();
+		if (pid == -1)
 			return (1);
-		if (pid[i] == 0)
+		if (pid == 0)
 		{
-			printf("Pid : %d Arg : %s\n", pid[i], args[i]);
+			printf("%s\n", scmd[i]);
 			exit(0);
 		}
-		if (!wait_children(pid[i], &status))
+		if (!wait_children(pid, &status))
 			return (printf("error"), 1);
 		i++;
 	}
