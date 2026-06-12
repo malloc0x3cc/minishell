@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:01:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/06/07 19:24:21 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/06/12 15:23:56 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,18 +23,18 @@
 typedef enum e_token_type
 {
 	TOKEN_WORD,
-	TOKEN_IN,		/* < */
-	TOKEN_OUT,		/* > */
+	TOKEN_OUTFILE,	/* > */
+	TOKEN_INFILE,	/* < */
 	TOKEN_APPEND,	/* >> */
 	TOKEN_HEREDOC,	/* << */
 	TOKEN_PIPE,		/* | */
 }	t_token_type;
 
-typedef struct s_token
+typedef struct s_cmd
 {
-	char			**str;
+	char			**args;
 	t_token_type	type;
 	struct s_token	*next;
-}	t_token;
+}	t_cmd;
 
 #endif
