@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:01:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/06/15 16:18:44 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/06/15 17:20:15 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,14 +31,24 @@ typedef enum e_token_type
 	TOKEN_PIPE,		/* | */
 }	t_token_type;
 
+typedef struct s_token
+{
+	char			*str;
+	t_token_type	type;
+	struct s_token	*next;
+}	t_token;
+
 typedef struct s_cmd
 {
 	char			**args;
-	t_token_type	type;
-	struct s_token	*next;
+	struct s_cmd	*next;
 }	t_cmd;
 
 /* lexer */
-t_cmd	*lexer(char *input);
+t_token	*lexer(char *input);
+/* lexer_utils */
+void	print_tokens(t_token *t);
+t_token	*create_token(char *str, t_token_type type);
+void	add_token_back(t_token **head, t_token *new);
 
 #endif

@@ -6,69 +6,63 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/10 11:07:22 by madelwau          #+#    #+#             */
-/*   Updated: 2026/06/15 16:21:18 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/06/15 17:24:46 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-/* debug, remove later */
-static void	print_tokens(t_cmd *t)
+static int	is_redir(char c)
 {
-	int	i;
-
-	i = 0;
-	while (t->next)
-	{
-		printf("=== %d ===\nSTR: %s\nTYPE: %s\nNEXT: %s\n", i++, t->str, t->type, t->next);
-		t = t->next;
-	}
+	return (c == '|' || c == '<' || c == '>');
 }
 
-t_cmd	*lexer(char *input)
+static t_token_type	handle_redir(char *input)
 {
-	t_cmd	*t;
-	size_t	i;
-	size_t	wordlen;
+	if (*input == '<')
+		return (TOKEN_INFILE);
+	else if (*input == '>')
+		return (TOKEN_OUTFILE);
+	return (TOKEN_PIPE);
+}
 
-	t = NULL;
-	i = 0;
+static char	*handle_args(char **input)
+{
+	char	*start;
+	size_t	word_len;
+
+	start = *input;
+	word_len = 0;
+	while (**input && !ft_isspace(**input) && !is_redir(**input))
+	{
+		word_len++;
+		(*input)++;
+	}
+	return (ft_substr(start, 0, word_len));
+}
+
+t_token	*lexer(char *input)
+{
+	t_token	*head;
+	char	*word;
+
+	head = NULL;
 	while (*input)
 	{
-		wordlen = 0;
-		// skip spaces
-		while (ft_isspace(*input))
+		while (*input && ft_isspace(*input))
 			input++;
 		if (!*input)
 			break ;
-		// special tokens
-		if (*input == '|' || *input == '<' || *input == '>')
+		if (is_redir(*input))
 		{
-			if (*input == '|')
-				t->type = TOKEN_PIPE;
-			else if (*input == '<')
-				t->type = TOKEN_INFILE;
-			else if (*input == '>')
-				t->type = TOKEN_OUTFILE;
+			add_token_back(&head, create_token(ft_substr(input, 0, 1), handle_redir(input)));
 			input++;
-			i++;
-			continue ;
 		}
-		// text
 		else
 		{
-			while (*input && !ft_isspace(input)
-				&& *input != '|' && *input != '<' && *input != '>')
-			{
-				wordlen++;
-				input++;
-			}
-			t[i].args = ft_substr(input - wordlen, 0, wordlen);
-			t[i].type = TOKEN_WORD;
-			input += wordlen;
-			i++;
+			word = handle_args(&input);
+			add_token_back(&head, create_token(word, TOKEN_WORD));
 		}
 	}
-	t[i].next = NULL;
-	return (t);
+	return (head);
 }

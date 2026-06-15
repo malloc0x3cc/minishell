@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:00:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/06/05 16:01:52 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/06/15 17:27:32 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 int	main(void)
 {
 	char	*input;
+	t_token	*tokens;
 
 	while (1)
 	{
@@ -24,7 +25,8 @@ int	main(void)
 		if (*input)
 		{
 			add_history(input);
-			printf("%s\n", input);
+			tokens = lexer(input);
+			print_tokens(tokens);
 		}
 		free(input);
 	}
