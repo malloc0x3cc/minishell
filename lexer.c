@@ -6,14 +6,14 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/10 11:07:22 by madelwau          #+#    #+#             */
-/*   Updated: 2026/06/10 14:00:06 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/06/15 16:21:18 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 /* debug, remove later */
-static void	print_tokens(t_token *t)
+static void	print_tokens(t_cmd *t)
 {
 	int	i;
 
@@ -25,9 +25,9 @@ static void	print_tokens(t_token *t)
 	}
 }
 
-t_token	*lexer(char *input)
+t_cmd	*lexer(char *input)
 {
-	t_token	*t;
+	t_cmd	*t;
 	size_t	i;
 	size_t	wordlen;
 
@@ -47,9 +47,9 @@ t_token	*lexer(char *input)
 			if (*input == '|')
 				t->type = TOKEN_PIPE;
 			else if (*input == '<')
-				t->type = TOKEN_IN;
+				t->type = TOKEN_INFILE;
 			else if (*input == '>')
-				t->type = TOKEN_OUT;
+				t->type = TOKEN_OUTFILE;
 			input++;
 			i++;
 			continue ;
@@ -63,7 +63,7 @@ t_token	*lexer(char *input)
 				wordlen++;
 				input++;
 			}
-			t[i].str = ft_substr(input - wordlen, 0, wordlen);
+			t[i].args = ft_substr(input - wordlen, 0, wordlen);
 			t[i].type = TOKEN_WORD;
 			input += wordlen;
 			i++;
