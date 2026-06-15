@@ -6,16 +6,16 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/15 16:36:21 by madelwau          #+#    #+#             */
-/*   Updated: 2026/06/15 17:29:09 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/06/15 19:20:56 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-/* ************************ */
-/*    TODO: remove later.   */
-/* ************************ */
-void	print_tokens(t_token *t)
+/* ******************************** */
+/*        TODO: remove later.       */
+/* ******************************** */
+void	debug_tokens(t_token *t)
 {
 	int	i;
 

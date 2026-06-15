@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:01:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/06/15 17:20:15 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/06/15 21:16:20 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,9 +45,9 @@ typedef struct s_cmd
 }	t_cmd;
 
 /* lexer */
-t_token	*lexer(char *input);
+t_token	*lexer(char *s);
 /* lexer_utils */
-void	print_tokens(t_token *t);
+void	debug_tokens(t_token *t);
 t_token	*create_token(char *str, t_token_type type);
 void	add_token_back(t_token **head, t_token *new);
 
