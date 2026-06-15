@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/10 11:07:22 by madelwau          #+#    #+#             */
-/*   Updated: 2026/06/15 21:23:30 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/06/15 21:30:49 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,6 @@ t_token	*lexer(char *s)
 {
 	t_token			*t;
 	t_token_type	type;
-	char			*word;
 
 	t = NULL;
 	while (*s)
@@ -74,10 +73,7 @@ t_token	*lexer(char *s)
 				add_token_back(&t, create_token(ft_substr(s++, 0, 1), type));
 		}
 		else
-		{
-			word = handle_args(&s);
-			add_token_back(&t, create_token(word, TOKEN_WORD));
-		}
+			add_token_back(&t, create_token(handle_args(&s), TOKEN_WORD));
 	}
 	return (t);
 }
