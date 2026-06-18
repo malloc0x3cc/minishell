@@ -1,37 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   heredoc.c                                          :+:      :+:    :+:   */
+/*   pipe.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: gahubert <gahubert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/06/16 14:43:36 by gahubert          #+#    #+#             */
-/*   Updated: 2026/06/17 17:30:22 by gahubert         ###   ########.fr       */
+/*   Created: 2026/06/18 15:22:24 by gahubert          #+#    #+#             */
+/*   Updated: 2026/06/18 15:22:43 by gahubert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static char **read_heredoc(char *delimiter)
-{
-	char *input;
-
-	while(input != delimiter)
-	{
-		input = readline()
-	}
-}
-
-static char *expand_heredoc()
+int	executepipe(t_token *cmd)
 {
 
 }
-
-void	write_heredoc(t_token token)
-{
-
-	heredoc = read_heredoc(token.str);
-
-	return ;
-}
-
