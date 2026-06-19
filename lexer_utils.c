@@ -6,15 +6,13 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/15 16:36:21 by madelwau          #+#    #+#             */
-/*   Updated: 2026/06/15 19:20:56 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/06/19 11:55:36 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-/* ******************************** */
-/*        TODO: remove later.       */
-/* ******************************** */
+/* remove later */
 void	debug_tokens(t_token *t)
 {
 	int	i;
@@ -22,7 +20,7 @@ void	debug_tokens(t_token *t)
 	i = 0;
 	while (t)
 	{
-		printf("=== %d ===\nSTR: %s\nTYPE: %d\nNEXT: %p\n", i++, t->str, t->type, t->next);
+		printf("=== %d ===\nSTR: %s\nLEN: %ld\nTYPE: %d\nNEXT: %p\n", i++, t->str, ft_strlen(t->str), t->type, t->next);
 		t = t->next;
 	}
 }
@@ -40,7 +38,7 @@ t_token	*create_token(char *str, t_token_type type)
 	return (new);
 }
 
-void	add_token_back(t_token **head, t_token *new)
+void	add_token(t_token **head, t_token *new)
 {
 	t_token	*tmp;
 

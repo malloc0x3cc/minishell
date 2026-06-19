@@ -6,7 +6,7 @@
 #    By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/11/05 21:13:28 by madelwau          #+#    #+#              #
-#    Updated: 2026/06/05 02:14:45 by madelwau         ###   ########.fr        #
+#    Updated: 2026/06/19 11:44:31 by madelwau         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,7 +22,8 @@ OBJ_DIR		:= .obj/
 
 STR_SRCS	:= ft_split.c ft_strchr.c ft_strcmp.c ft_strdup.c ft_striteri.c \
               ft_strjoin.c ft_strlcat.c ft_strlcpy.c ft_strlen.c ft_strmapi.c \
-              ft_strncmp.c ft_strnstr.c ft_strrchr.c ft_strtrim.c ft_substr.c
+              ft_strncmp.c ft_strndup.c ft_strnstr.c ft_strrchr.c ft_strtrim.c \
+			  ft_substr.c
 MEM_SRCS	:= ft_bzero.c ft_calloc.c ft_memchr.c ft_memcmp.c ft_memcpy.c \
               ft_memmove.c ft_memset.c
 IS_SRCS		:= ft_isalnum.c ft_isalpha.c ft_isascii.c ft_isdigit.c ft_islower.c \
