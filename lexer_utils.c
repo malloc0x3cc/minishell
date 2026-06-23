@@ -6,22 +6,42 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/15 16:36:21 by madelwau          #+#    #+#             */
-/*   Updated: 2026/06/19 11:55:36 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/06/23 10:36:37 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-/* remove later */
-void	debug_tokens(t_token *t)
+void	free_tokens(t_token *t)
 {
-	int	i;
+	t_token	*tmp;
 
-	i = 0;
 	while (t)
 	{
-		printf("=== %d ===\nSTR: %s\nLEN: %ld\nTYPE: %d\nNEXT: %p\n", i++, t->str, ft_strlen(t->str), t->type, t->next);
-		t = t->next;
+		tmp = t->next;
+		free(t->str);
+		free(t);
+		t = tmp;
+	}
+}
+
+void	free_cmds(t_cmd *cmd)
+{
+	t_cmd	*tmp;
+	int		i;
+
+	while (cmd)
+	{
+		tmp = cmd->next;
+		if (cmd->args)
+		{
+			i = 0;
+			while (cmd->args[i])
+				free(cmd->args[i++]);
+			free(cmd->args);
+		}
+		free(cmd);
+		cmd = tmp;
 	}
 }
 
