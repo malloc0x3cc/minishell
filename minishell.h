@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:01:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/06/23 10:42:58 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/06/29 08:06:16 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,21 @@ typedef enum e_token_type
 	TOKEN_PIPE,		// |
 }	t_token_type;
 
+typedef enum e_redir_type
+{
+	REDIR_OUT,	// >
+	REDIR_IN,	// <
+	REDIR_APPEND,	// >>
+	REDIR_HEREDOC,	// <<
+}	t_redir_type;
+
+typedef struct s_redir
+{
+	char			*name;
+	t_redir_type	type;
+	struct s_redir	*next;
+}	t_redir;
+
 typedef struct s_token
 {
 	char			*str;
@@ -41,6 +56,7 @@ typedef struct s_token
 typedef struct s_cmd
 {
 	char			**args;
+	t_redir			*redirs;
 	struct s_cmd	*next;
 }	t_cmd;
 
