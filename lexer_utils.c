@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/15 16:36:21 by madelwau          #+#    #+#             */
-/*   Updated: 2026/06/23 10:36:37 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/06/29 07:45:32 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,12 +27,13 @@ void	free_tokens(t_token *t)
 
 void	free_cmds(t_cmd *cmd)
 {
-	t_cmd	*tmp;
+	t_cmd	*tmp_cmd;
+	t_redir	*tmp_redir;
 	int		i;
 
 	while (cmd)
 	{
-		tmp = cmd->next;
+		tmp_cmd = cmd->next;
 		if (cmd->args)
 		{
 			i = 0;
@@ -40,8 +41,15 @@ void	free_cmds(t_cmd *cmd)
 				free(cmd->args[i++]);
 			free(cmd->args);
 		}
+		while (cmd->redirs)
+		{
+			tmp_redir = cmd->redirs->next;
+			free(cmd->redirs->name);
+			free(cmd->redirs);
+			cmd->redirs = tmp_redir;
+		}
 		free(cmd);
-		cmd = tmp;
+		cmd = tmp_cmd;
 	}
 }
 

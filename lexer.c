@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/10 11:07:22 by madelwau          #+#    #+#             */
-/*   Updated: 2026/06/19 11:54:47 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/06/29 07:51:39 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,14 +38,24 @@ static char	*handle_args(char **input)
 {
 	char	*start;
 	size_t	word_len;
+	char	quote;
 
 	start = *input;
 	word_len = 0;
-	while (**input && !ft_isspace(**input) && !is_redir(**input))
+	quote = '\0';
+	while (**input)
 	{
+		if ((**input == '\'' || **input == '"') && quote == '\0')
+			quote = **input;
+		else if (**input == quote)
+			quote = '\0';
+		if (quote == '\0' && (ft_isspace(**input) || is_redir(**input)))
+			break ;
 		word_len++;
 		(*input)++;
 	}
+	if (quote != '\0')
+		printf("Error: Open quotes\n");
 	return (ft_substr(start, 0, word_len));
 }
 
