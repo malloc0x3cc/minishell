@@ -6,11 +6,56 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:00:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/06/23 10:40:35 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/06/29 08:09:34 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+static char	*clean_str(char *str)
+{
+	char	*clean;
+	char	quote;
+	int		i;
+	int		j;
+
+	clean = malloc(sizeof(char) * (ft_strlen(str) + 1));
+	if (!clean)
+		return (NULL);
+	quote = '\0';
+	i = 0;
+	j = 0;
+	while (str[i])
+	{
+		if ((str[i] == '\'' || str[i] == '"') && quote == '\0')
+			quote = str[i];
+		else if (str[i] == quote)
+			quote = '\0';
+		else
+			clean[j++] = str[i];
+		i++;
+	}
+	clean[j] = '\0';
+	return (clean);
+}
+
+static void	remove_quotes(t_token *tokens)
+{
+	t_token	*tmp;
+	char	*old_str;
+
+	tmp = tokens;
+	while (tmp)
+	{
+		if (tmp->type == TOKEN_WORD)
+		{
+			old_str = tmp->str;
+			tmp->str = clean_str(old_str);
+			free(old_str);
+		}
+		tmp = tmp->next;
+	}
+}
 
 int	main(void)
 {
@@ -27,6 +72,7 @@ int	main(void)
 		{
 			add_history(input);
 			tokens = lexer(input);
+			remove_quotes(tokens);
 			cmds = parser(tokens);
 			debug_tokens(tokens);
 			debug_cmds(cmds);
