@@ -20,7 +20,7 @@ AR			:= ar
 ARFLAGS		:= rcs
 OBJ_DIR		:= .obj/
 
-STR_SRCS	:= ft_split.c ft_strchr.c ft_strcmp.c ft_strdup.c ft_striteri.c \
+STR_SRCS	:= ft_free_tab.c ft_split.c ft_strchr.c ft_strcmp.c ft_strdup.c ft_striteri.c \
               ft_strjoin.c ft_strlcat.c ft_strlcpy.c ft_strlen.c ft_strmapi.c \
               ft_strncmp.c ft_strndup.c ft_strnstr.c ft_strrchr.c ft_strtrim.c \
 			  ft_substr.c

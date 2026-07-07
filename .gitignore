@@ -60,3 +60,4 @@ a.out
 minishell
 .vscode/
 .DS_Store/
+valgrindignore.supp

@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:01:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/06/29 08:06:16 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/07/07 09:59:55 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,9 @@
 
 # include <stdio.h>
 # include <stdlib.h>
+# include <unistd.h>      // fork, dup2, execve, pipe, close
+# include <fcntl.h>       // open, O_RDONLY, O_WRONLY, O_CREAT, O_TRUNC
+# include <sys/wait.h>    // waitpid, WIFEXITED, WEXITSTATUS
 # include <readline/readline.h>
 # include <readline/history.h>
 # include "libft/inc/libft.h"
@@ -69,6 +72,8 @@ t_token	*create_token(char *str, t_token_type type);
 void	add_token(t_token **head, t_token *new);
 /* parser */
 t_cmd	*parser(t_token *t);
+/* execution */
+int		execute(t_cmd *cmd, char **env);
 
 /* DEBUG, REMOVE LATER */
 void	debug_tokens(t_token *t);

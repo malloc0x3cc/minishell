@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:00:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/06/29 08:09:34 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/07/07 10:01:22 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,12 +57,13 @@ static void	remove_quotes(t_token *tokens)
 	}
 }
 
-int	main(void)
+int	main(int ac, char **av, char **env)
 {
 	char	*input;
 	t_token	*tokens;
 	t_cmd	*cmds;
 
+	((void) ac, (void) av);
 	while (1)
 	{
 		input = readline(PROMPT);
@@ -74,8 +75,8 @@ int	main(void)
 			tokens = lexer(input);
 			remove_quotes(tokens);
 			cmds = parser(tokens);
-			debug_tokens(tokens);
-			debug_cmds(cmds);
+			if (cmds)
+				execute(cmds, env);
 			free_tokens(tokens);
 			free_cmds(cmds);
 		}

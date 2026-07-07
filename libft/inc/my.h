@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/17 21:30:27 by madelwau          #+#    #+#             */
-/*   Updated: 2026/05/06 13:04:32 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/07/07 09:04:57 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ void	ft_putstr(char *s);
 void	ft_putendl(char *s);
 void	ft_putnbr(int nb);
 /* str */
+void	ft_free_tab(char **tab);
 int		ft_strcmp(const char *s1, const char *s2);
 /* to */
 double	ft_atof(const char *nptr);
