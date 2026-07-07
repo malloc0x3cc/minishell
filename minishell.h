@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:01:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/07/07 10:22:15 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/07/07 16:15:38 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,9 +74,5 @@ void	add_token(t_token **head, t_token *new);
 t_cmd	*parser(t_token *t);
 /* execution */
 int		execute(t_cmd *cmd, char **env);
-
-/* DEBUG, REMOVE LATER */
-void	debug_tokens(t_token *t);
-void	debug_cmds(t_cmd *cmd);
 
 #endif
