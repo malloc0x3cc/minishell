@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: gahubert <gahubert@student.42.fr>          +#+  +:+       +#+         #
+#    By: ghub <ghub@student.42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/06/04 12:58:29 by madelwau          #+#    #+#              #
-#    Updated: 2026/06/11 13:05:06 by gahubert         ###   ########.fr        #
+#    Updated: 2026/07/11 14:29:49 by ghub             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,7 +22,7 @@ LFT		:= $(LFT_DIR)/libft.a
 
 LIBS	:= -L$(LFT_DIR) -lft -lreadline
 
-SRCS	:= minishell.c execution.c error_handling.c
+SRCS	:= minishell.c args_utils.c execution.c execution_children.c execution_utils.c find_path.c heredoc.c redirection.c
 MODE	:= mandatory
 
 OBJ_DIR	:= .obj/
@@ -56,10 +56,3 @@ re: fclean all
 
 .PHONY: all clean fclean re
 -include $(DEPS)
-
-# Colors
-COL_R	:= \033[1;31m
-COL_G	:= \033[1;32m
-COL_B	:= \033[1;34m
-COL_Y	:= \033[1;33m
-COL_0	:= \033[0m
