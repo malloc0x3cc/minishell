@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/19 11:09:03 by madelwau          #+#    #+#             */
-/*   Updated: 2026/06/29 08:11:12 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/07/07 16:20:49 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,32 @@ static void	add_redir(t_redir **head, char *name, t_token_type type)
 	}
 }
 
+static void	handle_token(t_token **t, t_cmd *current, size_t *i)
+{
+	if ((*t)->type == TOKEN_PIPE)
+	{
+		current->args[*i] = NULL;
+		*t = (*t)->next;
+		current->next = create_cmd(*t);
+		*i = 0;
+	}
+	else if ((*t)->type != TOKEN_WORD)
+	{
+		if ((*t)->next)
+		{
+			add_redir(&current->redirs, (*t)->next->str, (*t)->type);
+			*t = (*t)->next->next;
+		}
+		else
+			*t = (*t)->next;
+	}
+	else
+	{
+		current->args[(*i)++] = ft_strdup((*t)->str);
+		*t = (*t)->next;
+	}
+}
+
 t_cmd	*parser(t_token *t)
 {
 	t_cmd	*head;
@@ -81,32 +107,19 @@ t_cmd	*parser(t_token *t)
 	if (!t)
 		return (NULL);
 	head = create_cmd(t);
+	if (!head)
+		return (NULL);
 	current = head;
 	i = 0;
 	while (t)
 	{
 		if (t->type == TOKEN_PIPE)
 		{
-			current->args[i] = NULL;
-			t = t->next;
-			current->next = create_cmd(t);
+			handle_token(&t, current, &i);
 			current = current->next;
-			i = 0;
-			continue ;
 		}
-		if (t->type != TOKEN_WORD)
-		{
-			if (t->next)
-			{
-				add_redir(&current->redirs, t->next->str, t->type);
-				t = t->next->next;
-			}
-			else
-				t = t->next;
-			continue ;
-		}
-		current->args[i++] = ft_strdup(t->str);
-		t = t->next;
+		else
+			handle_token(&t, current, &i);
 	}
 	current->args[i] = NULL;
 	return (head);
