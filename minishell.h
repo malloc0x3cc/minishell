@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:01:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/07/07 16:15:38 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/07/15 17:51:38 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,8 +43,8 @@ typedef struct s_token
 
 typedef enum e_redir_type
 {
-	REDIR_OUT,	// >
-	REDIR_IN,	// <
+	REDIR_OUT,		// >
+	REDIR_IN,		// <
 	REDIR_APPEND,	// >>
 	REDIR_HEREDOC,	// <<
 }	t_redir_type;
@@ -63,6 +63,21 @@ typedef struct s_cmd
 	struct s_cmd	*next;
 }	t_cmd;
 
+typedef struct s_exec
+{
+	int	pipe_fd[2];
+	int	in_fd;
+	int	*hd_fds;
+	int	idx;
+}	t_exec;
+
+typedef struct s_fds
+{
+	int	in_fd;
+	int	out_fd;
+	int	hd_fd;
+}	t_fds;
+
 /* lexer */
 t_token	*lexer(char *s);
 /* lexer_utils */
@@ -74,5 +89,12 @@ void	add_token(t_token **head, t_token *new);
 t_cmd	*parser(t_token *t);
 /* execution */
 int		execute(t_cmd *cmd, char **env);
+int		wait_children(pid_t pid, int *status);
+int		count_cmds(t_cmd *cmd);
+void	child_exec(t_cmd *cmd, t_fds *fds, char **env);
+int		handle_heredocs(t_cmd *cmd, int *hd_fds);
+char	**clean_args(char **args);
+char	*find_path(char *cmd, char **env);
+int		apply_redirs(char **args);
 
 #endif

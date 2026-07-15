@@ -6,179 +6,151 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 16:01:26 by gahubert          #+#    #+#             */
-/*   Updated: 2026/07/07 09:59:51 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/07/15 17:54:35 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
 /*
-** Cherche la commande dans PATH et retourne le chemin complet.
-** Ex: "ls" -> "/bin/ls"
-** Retourne NULL si non trouvé. A libérer après usage.
+** ============================================================================
+** setup_pipe
+** ============================================================================
+** Prepare le pipe pour la commande courante :
+**   - S'il y a une commande suivante (cmd->next), on cree un vrai pipe.
+**   - Sinon (derniere commande de la chaine), la sortie doit aller vers
+**     le stdout du shell : on force pipe_fd[1] a STDOUT_FILENO.
+** Retourne 0 si OK, 1 si pipe() a echoue.
+** ============================================================================
 */
-static char	*find_path(char *cmd, char **env)
+static int	setup_pipe(t_cmd *cmd, t_exec *ex)
 {
-	char	**paths;
-	char	*tmp;
-	char	*full;
-	int		i;
-
-	i = 0;
-	while (env[i] && ft_strncmp(env[i], "PATH=", 5) != 0)
-		i++;
-	if (!env[i])
-		return (NULL);
-	paths = ft_split(env[i] + 5, ':');
-	if (!paths)
-		return (NULL);
-	i = 0;
-	while (paths[i])
+	if (cmd->next)
 	{
-		tmp = ft_strjoin(paths[i], "/");
-		full = ft_strjoin(tmp, cmd);
-		free(tmp);
-		if (access(full, X_OK) == 0)
-		{
-			ft_free_tab(paths);
-			return (full);
-		}
-		free(full);
-		i++;
+		if (pipe(ex->pipe_fd) == -1)
+			return (perror("pipe"), 1);
 	}
-	ft_free_tab(paths);
-	return (NULL);
-}
-
-/*
-** FIX: adapted to t_redir
-*/
-static int	apply_redirs(t_redir *redir)
-{
-	int	fd;
-
-	while (redir)
-	{
-		if (redir->type == REDIR_OUT)
-			fd = open(redir->name, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-		else if (redir->type == REDIR_APPEND)
-			fd = open(redir->name, O_WRONLY | O_CREAT | O_APPEND, 0644);
-		else if (redir->type == REDIR_IN)
-			fd = open(redir->name, O_RDONLY);
-		else
-			fd = -1; // TODO: heredoc
-		if (fd == -1)
-			return (perror(redir->name), 1);
-		if (redir->type == REDIR_OUT || redir->type == REDIR_APPEND)
-		{
-			if (dup2(fd, STDOUT_FILENO) == -1)
-				return (close(fd), perror("dup2"), 1);
-		}
-		else if (redir->type == REDIR_IN)
-		{
-			if (dup2(fd, STDIN_FILENO) == -1)
-				return (close(fd), perror("dup2"), 1);
-		}
-		close(fd);
-		redir = redir->next;
-	}
+	else
+		ex->pipe_fd[1] = STDOUT_FILENO;
 	return (0);
 }
 
 /*
-** FIX: clean_args() not needed thanks to parsing
+** ============================================================================
+** fork_and_exec
+** ============================================================================
+** Fork le processus pour la commande courante.
+** Dans l'enfant : ferme le bout de lecture du pipe s'il existe, puis
+** delegue tout le travail (redirections, heredoc, execve) a child_exec(),
+** qui ne retourne jamais (exit direct).
+** Dans le parent : retourne simplement le pid de l'enfant cree.
+** Retourne -1 si fork() a echoue.
+** ============================================================================
 */
-static void	child_exec(t_cmd *cmd, int in_fd, int out_fd, char **env)
+static pid_t	fork_and_exec(t_cmd *cmd, char **env, t_exec *ex)
 {
-	char	*path;
-
-	if (in_fd != STDIN_FILENO)
+	pid_t	pid;
+	t_fds	fds;
+	
+	pid = fork();
+	if (pid == -1)
+		return (perror("fork"), -1);
+	if (pid == 0)
 	{
-		if (dup2(in_fd, STDIN_FILENO) == -1)
-			(perror("dup2"), exit(1));
-		close(in_fd);
+		if (cmd->next)
+			close(ex->pipe_fd[0]);
+		fds.in_fd = ex->in_fd;
+		fds.out_fd = ex->pipe_fd[1];
+		fds.hd_fd = ex->hd_fds[ex->idx];
+		child_exec(cmd, &fds, env);
 	}
-	if (out_fd != STDOUT_FILENO)
-	{
-		if (dup2(out_fd, STDOUT_FILENO) == -1)
-			(perror("dup2"), exit(1));
-		close(out_fd);
-	}
-	if (apply_redirs(cmd->redirs) != 0)
-		exit(1);
-	if (!cmd->args || !cmd->args[0])
-		exit(0);
-	path = find_path(cmd->args[0], env);
-	if (!path)
-	{
-		ft_putstr_fd("minishell: command not found: ", 2);
-		ft_putstr_fd(cmd->args[0], 2);
-		ft_putchar_fd('\n', 2);
-		exit(127);
-	}
-	execve(path, cmd->args, env);
-	perror(path);
-	free(path);
-	exit(1);
+	return (pid);
 }
 
 /*
-** Attend tous les enfants et retourne le code de sortie du dernier.
+** ============================================================================
+** close_and_advance
+** ============================================================================
+** Cote parent uniquement : ferme les fds devenus inutiles pour cette
+** iteration (bout ecriture du pipe, ancien in_fd, fd de heredoc), puis
+** fait avancer l'etat pour la commande suivante :
+**   - in_fd devient le bout lecture du pipe qu'on vient de creer
+**     (ou STDIN_FILENO s'il n'y a pas de commande suivante).
+**   - idx est incremente pour pointer sur le hd_fds de la prochaine
+**     commande.
+** ============================================================================
 */
-static int	wait_children(pid_t last_pid, int *status)
+static void	close_and_advance(t_cmd *cmd, t_exec *ex)
 {
-	pid_t	pid;
-
-	while (1)
-	{
-		pid = waitpid(-1, status, 0);
-		if (pid == -1)
-			break ;
-	}
-	(void)last_pid;
-	if (WIFEXITED(*status))
-		return (WEXITSTATUS(*status));
-	return (1);
+	if (cmd->next)
+		close(ex->pipe_fd[1]);
+	if (ex->in_fd != STDIN_FILENO)
+		close(ex->in_fd);
+	if (ex->hd_fds[ex->idx] != -1)
+		close(ex->hd_fds[ex->idx]);
+	ex->in_fd = STDIN_FILENO;
+	if (cmd->next)
+		ex->in_fd = ex->pipe_fd[0];
+	ex->idx++;
 }
 
 /*
-** Fonction principale d'exécution.
-** Gère les pipes entre les t_cmd chainés via ->next.
-** Chaque paire de cmds reliées partage un pipe.
+** ============================================================================
+** run_pipeline
+** ============================================================================
+** Boucle sur toute la chaine de commandes : pour chacune, prepare le
+** pipe, fork+exec, puis ferme/avance l'etat cote parent.
+** Retourne le pid du DERNIER enfant cree (utilise ensuite par
+** wait_children pour recuperer son code de sortie), ou -1 si une etape
+** a echoue en cours de route.
+** ============================================================================
 */
-int	execute(t_cmd *cmd, char **env)
+static pid_t	run_pipeline(t_cmd *cmd, char **env, t_exec *ex)
 {
-	int		pipe_fd[2];
-	int		in_fd;
 	pid_t	pid;
-	int		status;
 
-	in_fd = STDIN_FILENO;
 	pid = 0;
 	while (cmd)
 	{
-		if (cmd->next)
-		{
-			if (pipe(pipe_fd) == -1)
-				return (perror("pipe"), 1);
-		}
-		else
-			pipe_fd[1] = STDOUT_FILENO;
-		pid = fork();
+		if (setup_pipe(cmd, ex) == 1)
+			return (-1);
+		pid = fork_and_exec(cmd, env, ex);
 		if (pid == -1)
-			return (perror("fork"), 1);
-		if (pid == 0)
-		{
-			if (cmd->next)
-				close(pipe_fd[0]);
-			child_exec(cmd, in_fd, pipe_fd[1], env);
-		}
-		if (cmd->next)
-			close(pipe_fd[1]);
-		if (in_fd != STDIN_FILENO)
-			close(in_fd);
-		in_fd = (cmd->next) ? pipe_fd[0] : STDIN_FILENO;
+			return (-1);
+		close_and_advance(cmd, ex);
 		cmd = cmd->next;
 	}
+	return (pid);
+}
+
+/*
+** ============================================================================
+** execute
+** ============================================================================
+** Point d'entree principal de l'execution d'un pipeline.
+**   1. Alloue le tableau hd_fds (un slot par commande) et pre-lit tous
+**      les heredocs de la chaine AVANT tout fork (handle_heredocs).
+**   2. Initialise l'etat partage t_exec (in_fd de depart = stdin, idx = 0).
+**   3. Delegue toute la boucle de fork/pipe a run_pipeline().
+**   4. Libere hd_fds, puis attend tous les enfants et retourne le code
+**      de sortie du dernier via wait_children().
+** ============================================================================
+*/
+int	execute(t_cmd *cmd, char **env)
+{
+	t_exec	ex;
+	int		status;
+	pid_t	pid;
+
+	ex.hd_fds = malloc(sizeof(int) * count_cmds(cmd));
+	if (!ex.hd_fds)
+		return (1);
+	if (handle_heredocs(cmd, ex.hd_fds) != 0)
+		return (free(ex.hd_fds), 1);
+	ex.in_fd = STDIN_FILENO;
+	ex.idx = 0;
+	pid = run_pipeline(cmd, env, &ex);
+	free(ex.hd_fds);
+	if (pid == -1)
+		return (1);
 	return (wait_children(pid, &status));
 }
