@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 12:05:14 by madelwau          #+#    #+#             */
-/*   Updated: 2026/07/16 14:06:21 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/07/16 14:19:22 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,10 +129,11 @@ static void	init_ctx(t_sub_ctx *ctx, char **env, int status)
 ** Alloue et construit la nouvelle chaine de caracteres en effectuant le
 ** remplacement reel des variables d'environnement.
 **
-** Elle fonctionne sur la meme logique de parsing de quotes que get_expanded_len()
-** mais, au lieu de juste compter, elle recopie activement les caracteres de
-** la source 'str' vers 'dest'. Des qu'elle croise un '$' expansable hors de
-** simples quotes, elle passe le relais a sub_var() pour injecter la valeur.
+** Elle fonctionne sur la meme logique de parsing de quotes que
+** get_expanded_len() mais, au lieu de juste compter, elle recopie activement
+** les caracteres de la source 'str' vers 'dest'. Des qu'elle croise un '$'
+** expansable hors de simples quotes, elle passe le relais a sub_var()
+** pour injecter la valeur.
 **
 ** Retourne la nouvelle chaine allouee (terminée par '\0'), ou NULL en cas
 ** d'echec de malloc().
@@ -175,10 +176,12 @@ static char	*substitute_variables(char *str, size_t new_len, char **env,
 ** Point d'entree principal de l'expansion de variables pour le shell.
 ** Parcourt toute la liste chainee des tokens generes par le lexer.
 **
-** Pour chaque token de type TOKEN_WORD (les mots simples ou chaines de caracteres
-** susceptibles de contenir des variables) :
-**   1. get_expanded_len()  : calcule la taille future de la chaine apres expansion.
-**   2. substitute_variables() : alloue la nouvelle chaine et y remplace les $VAR.
+** Pour chaque token de type TOKEN_WORD (les mots simples ou chaines de
+** caracteres susceptibles de contenir des variables) :
+**   1. get_expanded_len()  : calcule la taille future de la chaine apres
+** expansion.
+**   2. substitute_variables() : alloue la nouvelle chaine et y remplace
+** les $VAR.
 **   3. Libere l'ancienne chaine (old_str) pour eviter les fuites memoire et
 **      la remplace dans le token par la nouvelle chaine translatee.
 **

@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/15 12:00:00 by madelwau          #+#    #+#             */
-/*   Updated: 2026/07/16 14:13:58 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/07/16 14:19:45 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,8 +94,8 @@ void	init_signals(void)
 **
 ** Durant l'execution, SIGINT est associe a handle_sigint_exec() afin de ne
 ** pas interferer avec l'affichage de Readline pendant que les enfants tournent.
-** SIGQUIT reste ignore au niveau du parent, mais les processus enfants heriteront
-** de leur propre configuration.
+** SIGQUIT reste ignore au niveau du parent, mais les processus enfants
+** heriteront de leur propre configuration.
 ** ============================================================================
 */
 void	set_signals_for_exec(void)

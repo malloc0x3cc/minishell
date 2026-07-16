@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 13:18:39 by madelwau          #+#    #+#             */
-/*   Updated: 2026/07/16 14:07:38 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/07/16 14:18:14 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,9 +121,9 @@ void	insert_status_value(char *dest, size_t *j, int last_status)
 ** ============================================================================
 ** add_var_len
 ** ============================================================================
-** Calcule la longueur réelle de la valeur d'une variable d'environnement (ou de
-** la variable spéciale $?) afin d'aider get_expanded_len() à déterminer la
-** taille globale de la chaîne après expansion.
+** Calcule la longueur réelle de la valeur d'une variable d'environnement
+** (ou de la variable spéciale $?) afin d'aider get_expanded_len()
+** à déterminer la taille globale de la chaîne après expansion.
 **
 ** Fonctionnement :
 **   1. Si on détecte un '?' après le '$' (donc à l'index *i + 1), on convertit
@@ -134,7 +134,8 @@ void	insert_status_value(char *dest, size_t *j, int last_status)
 **      L'index global 'i' est alors avancé de 1 + la longueur du nom de la
 **      variable traitée.
 **
-** Retourne la longueur de la valeur de la variable trouvée (0 si elle n'existe pas).
+** Retourne la longueur de la valeur de la variable trouvée
+** (0 si elle n'existe pas).
 ** ============================================================================
 */
 size_t	add_var_len(char *str, size_t *i, char **env, int status)
