@@ -6,11 +6,13 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:00:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/07/07 10:01:22 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/07/16 11:59:49 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+int		g_status = 0;
 
 static char	*clean_str(char *str)
 {
@@ -73,10 +75,11 @@ int	main(int ac, char **av, char **env)
 		{
 			add_history(input);
 			tokens = lexer(input);
+			expanser(tokens, env);
 			remove_quotes(tokens);
 			cmds = parser(tokens);
 			if (cmds)
-				execute(cmds, env);
+				g_status = execute(cmds, env);
 			free_tokens(tokens);
 			free_cmds(cmds);
 		}
