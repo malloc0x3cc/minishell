@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:01:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/07/16 12:27:02 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/07/16 13:35:18 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,15 @@ typedef struct s_fds
 	int	hd_fd;
 }	t_fds;
 
+typedef struct s_sub_ctx
+{
+	size_t	j;
+	int		s_q;
+	int		d_q;
+	char	**env;
+	int		status;
+}	t_sub_ctx;
+
 /* lexer */
 t_token	*lexer(char *s);
 /* lexer_utils */
@@ -89,6 +98,12 @@ void	add_token(t_token **head, t_token *new);
 t_cmd	*parser(t_token *t);
 /* expanser */
 void	expanser(t_token *tokens, char **env, int last_status);
+/* expanser_utils */
+char	*get_env_value(char *var, char **env);
+int		is_var_char(char c);
+size_t	get_var_name_len(char *str);
+void	insert_status_value(char *dest, size_t *j, int last_status);
+size_t	add_var_len(char *str, size_t *i, char **env, int status);
 /* signals */
 void	init_signals(void);
 void	set_signals_for_exec(void);

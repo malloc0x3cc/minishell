@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:00:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/07/16 12:44:44 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/07/16 13:14:35 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,11 +59,34 @@ static void	remove_quotes(t_token *tokens)
 	}
 }
 
+static int	shell_loop(char *input, char **env, int last_status)
+{
+	t_token	*tokens;
+	t_cmd	*cmds;
+
+	add_history(input);
+	tokens = lexer(input);
+	expanser(tokens, env, last_status);
+	remove_quotes(tokens);
+	cmds = parser(tokens);
+	if (cmds)
+	{
+		last_status = execute(cmds, env);
+		if (g_received_signal == SIGINT)
+		{
+			write(1, "\n", 1);
+			rl_on_new_line();
+			rl_replace_line("", 0);
+		}
+	}
+	free_tokens(tokens);
+	free_cmds(cmds);
+	return (last_status);
+}
+
 int	main(int ac, char **av, char **env)
 {
 	char	*input;
-	t_token	*tokens;
-	t_cmd	*cmds;
 	int		last_status;
 
 	((void) ac, (void) av);
@@ -76,25 +99,7 @@ int	main(int ac, char **av, char **env)
 		if (!input)
 			break ;
 		if (*input)
-		{
-			add_history(input);
-			tokens = lexer(input);
-			expanser(tokens, env, last_status);
-			remove_quotes(tokens);
-			cmds = parser(tokens);
-			if (cmds)
-			{
-				last_status = execute(cmds, env);
-				if (g_received_signal == SIGINT)
-				{
-					write(1, "\n", 1);
-					rl_on_new_line();
-					rl_replace_line("", 0);
-				}
-			}
-			free_tokens(tokens);
-			free_cmds(cmds);
-		}
+			last_status = shell_loop(input, env, last_status);
 		free(input);
 	}
 	rl_clear_history();
