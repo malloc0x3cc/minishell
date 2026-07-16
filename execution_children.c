@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/11 13:52:13 by ghub              #+#    #+#             */
-/*   Updated: 2026/07/15 18:28:39 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/07/16 12:08:58 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,6 +148,7 @@ static void	exec_cmd(t_cmd *cmd, char **env)
 */
 void	child_exec(t_cmd *cmd, t_fds *fds, char **env)
 {
+	reset_signals_for_child();
 	setup_fds(fds);
 	exec_cmd(cmd, env);
 }

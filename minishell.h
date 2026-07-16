@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:01:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/07/16 11:58:17 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/07/16 12:27:02 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,11 @@ void	add_token(t_token **head, t_token *new);
 /* parser */
 t_cmd	*parser(t_token *t);
 /* expanser */
-void	expanser(t_token *tokens, char **env);
+void	expanser(t_token *tokens, char **env, int last_status);
+/* signals */
+void	init_signals(void);
+void	set_signals_for_exec(void);
+void	reset_signals_for_child(void);
 /* execution */
 int		execute(t_cmd *cmd, char **env);
 int		wait_children(pid_t pid, int *status);
@@ -100,6 +104,6 @@ char	*find_path(char *cmd, char **env);
 int		apply_redirs(t_redir *redir);
 
 /* Return code */
-extern int	g_status;
+extern int	g_received_signal;
 
 #endif

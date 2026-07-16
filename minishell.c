@@ -6,13 +6,13 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:00:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/07/16 11:59:49 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/07/16 12:44:44 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int		g_status = 0;
+int	g_received_signal = 0;
 
 static char	*clean_str(char *str)
 {
@@ -64,10 +64,14 @@ int	main(int ac, char **av, char **env)
 	char	*input;
 	t_token	*tokens;
 	t_cmd	*cmds;
+	int		last_status;
 
 	((void) ac, (void) av);
+	init_signals();
+	last_status = 0;
 	while (1)
 	{
+		g_received_signal = 0;
 		input = readline(PROMPT);
 		if (!input)
 			break ;
@@ -75,11 +79,19 @@ int	main(int ac, char **av, char **env)
 		{
 			add_history(input);
 			tokens = lexer(input);
-			expanser(tokens, env);
+			expanser(tokens, env, last_status);
 			remove_quotes(tokens);
 			cmds = parser(tokens);
 			if (cmds)
-				g_status = execute(cmds, env);
+			{
+				last_status = execute(cmds, env);
+				if (g_received_signal == SIGINT)
+				{
+					write(1, "\n", 1);
+					rl_on_new_line();
+					rl_replace_line("", 0);
+				}
+			}
 			free_tokens(tokens);
 			free_cmds(cmds);
 		}

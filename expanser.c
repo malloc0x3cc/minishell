@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 12:05:14 by madelwau          #+#    #+#             */
-/*   Updated: 2026/07/16 12:05:15 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/07/16 12:29:29 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ static size_t	get_var_name_len(char *str)
 	return (i);
 }
 
-static size_t	get_expanded_len(char *str, char **env)
+static size_t	get_expanded_len(char *str, char **env, int last_status)
 {
 	size_t	len;
 	size_t	i;
@@ -71,7 +71,7 @@ static size_t	get_expanded_len(char *str, char **env)
 		{
 			if (str[i + 1] == '?')
 			{
-				status_str = ft_itoa(g_status);
+				status_str = ft_itoa(last_status);
 				len += ft_strlen(status_str);
 				free(status_str);
 				i += 2;
@@ -105,12 +105,12 @@ static void	insert_var_value(char *dest, size_t *j, char *var_name, char **env)
 	}
 }
 
-static void	insert_status_value(char *dest, size_t *j)
+static void	insert_status_value(char *dest, size_t *j, int last_status)
 {
 	char	*status_str;
 	size_t	k;
 
-	status_str = ft_itoa(g_status);
+	status_str = ft_itoa(last_status);
 	k = 0;
 	while (status_str && status_str[k])
 	{
@@ -121,7 +121,7 @@ static void	insert_status_value(char *dest, size_t *j)
 	free(status_str);
 }
 
-static char	*substitute_variables(char *str, size_t new_len, char **env)
+static char	*substitute_variables(char *str, size_t new_len, char **env, int last_status)
 {
 	char	*dest;
 	size_t	i;
@@ -154,7 +154,7 @@ static char	*substitute_variables(char *str, size_t new_len, char **env)
 		{
 			if (str[i + 1] == '?')
 			{
-				insert_status_value(dest, &j);
+				insert_status_value(dest, &j, last_status);
 				i += 2;
 			}
 			else
@@ -172,7 +172,7 @@ static char	*substitute_variables(char *str, size_t new_len, char **env)
 	return (dest);
 }
 
-void	expanser(t_token *tokens, char **env)
+void	expanser(t_token *tokens, char **env, int last_status)
 {
 	t_token	*tmp;
 	char	*old_str;
@@ -183,9 +183,9 @@ void	expanser(t_token *tokens, char **env)
 	{
 		if (tmp->type == TOKEN_WORD)
 		{
-			new_len = get_expanded_len(tmp->str, env);
+			new_len = get_expanded_len(tmp->str, env, last_status);
 			old_str = tmp->str;
-			tmp->str = substitute_variables(old_str, new_len, env);
+			tmp->str = substitute_variables(old_str, new_len, env, last_status);
 			free(old_str);
 		}
 		tmp = tmp->next;

@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 16:01:26 by gahubert          #+#    #+#             */
-/*   Updated: 2026/07/15 18:34:58 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/07/16 12:43:42 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,11 +146,13 @@ int	execute(t_cmd *cmd, char **env)
 		return (1);
 	if (handle_heredocs(cmd, ex.hd_fds) != 0)
 		return (free(ex.hd_fds), 1);
+	set_signals_for_exec();
 	ex.in_fd = STDIN_FILENO;
 	ex.idx = 0;
 	pid = run_pipeline(cmd, env, &ex);
 	free(ex.hd_fds);
 	if (pid == -1)
-		return (1);
-	return (wait_children(pid, &status));
+		return (init_signals(), 1);
+	status = wait_children(pid, &status);
+	return (init_signals(), status);
 }
