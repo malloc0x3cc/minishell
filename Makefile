@@ -6,7 +6,7 @@
 #    By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/06/04 12:58:29 by madelwau          #+#    #+#              #
-#    Updated: 2026/07/15 17:58:15 by madelwau         ###   ########.fr        #
+#    Updated: 2026/07/15 18:28:00 by madelwau         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,9 +22,8 @@ LFT		:= $(LFT_DIR)/libft.a
 
 LIBS	:= -L$(LFT_DIR) -lft -lreadline
 
-SRCS	:= minishell.c args_utils.c execution.c \
-			execution_children.c execution_utils.c \
-			find_path.c heredoc.c redirection.c \
+SRCS	:= minishell.c find_path.c heredoc.c redirection.c \
+			execution.c execution_children.c execution_utils.c \
 			lexer.c lexer_utils.c parser.c
 MODE	:= mandatory
 

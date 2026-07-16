@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution_children.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ghub <ghub@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/11 13:52:13 by ghub              #+#    #+#             */
-/*   Updated: 2026/07/11 13:56:28 by ghub             ###   ########.fr       */
+/*   Updated: 2026/07/15 18:28:39 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,20 +111,18 @@ static void	cmd_not_found(char *name)
 ** avec exit(127) (convention shell).
 ** ============================================================================
 */
-static void	exec_cmd(char **args, char **env)
+static void	exec_cmd(t_cmd *cmd, char **env)
 {
 	char	*path;
-	char	**exec_args;
 
-	if (apply_redirs(args) != 0)
+	if (apply_redirs(cmd->redirs) != 0)
 		exit(1);
-	exec_args = clean_args(args);
-	if (!exec_args || !exec_args[0])
+	if (!cmd->args || !cmd->args[0])
 		exit(0);
-	path = find_path(exec_args[0], env);
+	path = find_path(cmd->args[0], env);
 	if (!path)
-		cmd_not_found(exec_args[0]);
-	execve(path, exec_args, env);
+		cmd_not_found(cmd->args[0]);
+	execve(path, cmd->args, env);
 	perror(path);
 	free(path);
 	exit(1);
@@ -151,5 +149,5 @@ static void	exec_cmd(char **args, char **env)
 void	child_exec(t_cmd *cmd, t_fds *fds, char **env)
 {
 	setup_fds(fds);
-	exec_cmd(cmd->args, env);
+	exec_cmd(cmd, env);
 }

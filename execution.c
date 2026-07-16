@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 16:01:26 by gahubert          #+#    #+#             */
-/*   Updated: 2026/07/15 17:54:35 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/07/15 18:34:58 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ static pid_t	fork_and_exec(t_cmd *cmd, char **env, t_exec *ex)
 {
 	pid_t	pid;
 	t_fds	fds;
-	
+
 	pid = fork();
 	if (pid == -1)
 		return (perror("fork"), -1);
