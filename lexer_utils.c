@@ -6,12 +6,25 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/15 16:36:21 by madelwau          #+#    #+#             */
-/*   Updated: 2026/06/29 07:45:32 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/07/16 14:10:16 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+/*
+** ============================================================================
+** free_tokens
+** ============================================================================
+** Libere proprement et recursivement toute la liste chainee de tokens
+** generee par le lexer.
+**
+** Pour chaque maillon, on prend soin de liberer d'abord la chaine de
+** caracteres allouee (t->str) avant de liberer la structure t elle-meme,
+** garantissant l'absence de fuite memoire (memory leaks) lors du nettoyage
+** de la phase de lexing.
+** ============================================================================
+*/
 void	free_tokens(t_token *t)
 {
 	t_token	*tmp;
@@ -25,6 +38,22 @@ void	free_tokens(t_token *t)
 	}
 }
 
+/*
+** ============================================================================
+** free_cmds
+** ============================================================================
+** Nettoie et libere l'integralite de la structure de commandes (t_cmd)
+** ainsi que toutes ses dependances dynamiques :
+**   1. Le tableau d'arguments (cmd->args), en liberant chaque string puis
+**      le tableau de pointeurs lui-meme.
+**   2. La liste chainee des redirections (cmd->redirs), en liberant le nom
+**      de chaque fichier (redir->name) et le maillon.
+**   3. La structure de commande principale.
+**
+** Cette fonction est cruciale pour nettoyer l'arbre de commande a chaque
+** fin de boucle du shell.
+** ============================================================================
+*/
 void	free_cmds(t_cmd *cmd)
 {
 	t_cmd	*tmp_cmd;
@@ -53,6 +82,20 @@ void	free_cmds(t_cmd *cmd)
 	}
 }
 
+/*
+** ============================================================================
+** create_token
+** ============================================================================
+** Alloue et initialise un nouveau maillon de type t_token.
+**
+** Associe la chaine str recue (qui correspond au lexeme extrait) et son
+** type de token associe (TOKEN_WORD, TOKEN_PIPE, etc.) au nouveau maillon,
+** puis initialise le pointeur ->next a NULL.
+**
+** Retourne le pointeur vers le token alloue, ou NULL en cas d'echec de
+** malloc().
+** ============================================================================
+*/
 t_token	*create_token(char *str, t_token_type type)
 {
 	t_token	*new;
@@ -66,6 +109,17 @@ t_token	*create_token(char *str, t_token_type type)
 	return (new);
 }
 
+/*
+** ============================================================================
+** add_token
+** ============================================================================
+** Ajoute un token fraichement cree a la fin de la liste chainee de tokens.
+**
+** Si la liste est vide (*head == NULL), le nouveau token en devient la
+** racine. Sinon, on parcourt la liste jusqu'au dernier element pour y
+** greffer le nouveau maillon.
+** ============================================================================
+*/
 void	add_token(t_token **head, t_token *new)
 {
 	t_token	*tmp;

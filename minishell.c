@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:00:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/07/16 13:14:35 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/07/16 14:11:59 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,21 @@
 
 int	g_received_signal = 0;
 
+/*
+** ============================================================================
+** clean_str
+** ============================================================================
+** Alloue une nouvelle chaine et y recopie 'str' en retirant les quotes qui
+** ont servi a definir les arguments (quote removal), conformement au
+** comportement classique de Bash.
+**
+** Seuls les quotes exterieurs et effectifs sont supprimes :
+** Un simple quote dans des doubles quotes (ex: "hello 'world'") ou inversement
+** est preserve car il ne sert pas de delimiteur a ce niveau.
+**
+** Retourne la chaine "nettoyee" sans les quotes, ou NULL en cas d'echec.
+** ============================================================================
+*/
 static char	*clean_str(char *str)
 {
 	char	*clean;
@@ -41,6 +56,18 @@ static char	*clean_str(char *str)
 	return (clean);
 }
 
+/*
+** ============================================================================
+** remove_quotes
+** ============================================================================
+** Parcourt toute la liste chainee des tokens et applique l'etape de "Quote
+** Removal" sur chaque TOKEN_WORD.
+**
+** Remplace la chaine originale du token par sa version nettoyee (sans les
+** quotes protecteurs devenus inutiles apres l'expansion) via clean_str(),
+** puis libere proprement l'ancienne chaine de caracteres.
+** ============================================================================
+*/
 static void	remove_quotes(t_token *tokens)
 {
 	t_token	*tmp;
@@ -59,6 +86,24 @@ static void	remove_quotes(t_token *tokens)
 	}
 }
 
+/*
+** ============================================================================
+** shell_loop
+** ============================================================================
+** Execute le cycle de vie complet d'une ligne de commande saisie :
+**   1. add_history() : Enregistre l'entree dans l'historique readline.
+**   2. lexer()       : Decoupe l'entree brute en tokens.
+**   3. expanser()    : Remplace les variables $VAR et $? par leur valeur.
+**   4. remove_quotes(): Retire les guillemets devenus inutiles.
+**   5. parser()      : Organise les tokens en une structure de commandes.
+**   6. execute()     : Lance l'execution (pipes, heredocs, redirections).
+**
+** Gere egalement l'affichage d'un saut de ligne si le processus a ete
+** interrompu par un signal SIGINT (Ctrl+C).
+** Libere toutes les structures de donnees allouees avant de retourner le
+** dernier status d'execution obtenu.
+** ============================================================================
+*/
 static int	shell_loop(char *input, char **env, int last_status)
 {
 	t_token	*tokens;
@@ -84,6 +129,25 @@ static int	shell_loop(char *input, char **env, int last_status)
 	return (last_status);
 }
 
+/*
+** ============================================================================
+** main
+** ============================================================================
+** Point d'entree du programme Minishell.
+**
+** Initialise la gestion des signaux globaux (Ctrl+C ignore Ctrl+\) et lance la
+** boucle de lecture infinie (REPL) via readline().
+**
+** A chaque iteration :
+**   - Lit l'entree utilisateur sur le prompt standard.
+**   - Si l'utilisateur envoie un EOF (Ctrl+D), readline() retourne NULL, on
+**     sort de la boucle pour quitter le programme proprement.
+**   - Si l'entree n'est pas vide, elle est passee a shell_loop() qui traite
+**     l'expression et met a jour last_status.
+**
+** Libere l'historique readline avant de retourner le code de sortie final.
+** ============================================================================
+*/
 int	main(int ac, char **av, char **env)
 {
 	char	*input;

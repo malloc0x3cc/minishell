@@ -6,12 +6,24 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/19 11:09:03 by madelwau          #+#    #+#             */
-/*   Updated: 2026/07/07 16:20:49 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/07/16 14:14:11 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+/*
+** ============================================================================
+** count_tokens
+** ============================================================================
+** Compte le nombre d'arguments simples (TOKEN_WORD) associes a une commande
+** courante, en s'arretant au premier pipe croise (qui delimite la commande
+** suivante).
+**
+** Ce pre-calcul permet au parser d'allouer exactement la bonne taille pour
+** le tableau cmd->args, s'epargnant ainsi des reallocations successives.
+** ============================================================================
+*/
 static size_t	count_tokens(t_token *t)
 {
 	size_t	i;
@@ -26,6 +38,20 @@ static size_t	count_tokens(t_token *t)
 	return (i);
 }
 
+/*
+** ============================================================================
+** create_cmd
+** ============================================================================
+** Alloue une structure t_cmd pour representer une commande de notre pipeline
+** et reserve l'espace memoire necessaire pour son tableau d'arguments (args).
+**
+** La taille du tableau est determinee par count_tokens(). On initialise
+** egalement la liste des redirections associees (redirs) et le pointeur vers
+** la commande suivante (next) a NULL.
+**
+** Retourne la commande allouee, ou NULL en cas d'echec de allocation.
+** ============================================================================
+*/
 static t_cmd	*create_cmd(t_token *t)
 {
 	t_cmd	*cmd;
@@ -43,6 +69,21 @@ static t_cmd	*create_cmd(t_token *t)
 	return (cmd);
 }
 
+/*
+** ============================================================================
+** add_redir
+** ============================================================================
+** Alloue et ajoute un nouvel element de redirection (t_redir) a la fin de
+** la liste des redirections de la commande en cours (head).
+**
+** Traduit le type de token du lexer vers le type interne associe :
+**   - TOKEN_INFILE   -> REDIR_IN
+**   - TOKEN_OUTFILE  -> REDIR_OUT
+**   - TOKEN_APPEND   -> REDIR_APPEND
+**   - TOKEN_HEREDOC  -> REDIR_HEREDOC
+** Conserve une copie du nom du fichier ou du delimiteur grace a ft_strdup().
+** ============================================================================
+*/
 static void	add_redir(t_redir **head, char *name, t_token_type type)
 {
 	t_redir	*new;
@@ -72,6 +113,22 @@ static void	add_redir(t_redir **head, char *name, t_token_type type)
 	}
 }
 
+/*
+** ============================================================================
+** handle_token
+** ============================================================================
+** Traite individuellement un token au sein de la boucle du parser :
+**   1. TOKEN_PIPE : Termine la commande actuelle (en ajoutant la sentinelle NULL
+**      a la fin du tableau d'arguments), cree la structure de la commande
+**      suivante, et réinitialise l'index des arguments.
+**   2. Redirection (<, >, <<, >>) : Ajoute une redirection a la liste de la
+**      commande actuelle en recuperant le nom du fichier associe dans le
+**      token suivant, puis avance le pointeur de lecture au-dela de ces deux
+**      tokens.
+**   3. TOKEN_WORD : Duplique le mot pour l'ajouter a la liste d'arguments de
+**      la commande actuelle.
+** ============================================================================
+*/
 static void	handle_token(t_token **t, t_cmd *current, size_t *i)
 {
 	if ((*t)->type == TOKEN_PIPE)
@@ -98,6 +155,19 @@ static void	handle_token(t_token **t, t_cmd *current, size_t *i)
 	}
 }
 
+/*
+** ============================================================================
+** parser
+** ============================================================================
+** Transforme la liste plate de tokens issue du lexer/expanser en un arbre de
+** syntaxe simplifie (pipeline de structures t_cmd).
+**
+** Chaque commande de la liste possedera son propre tableau d'arguments purges
+** de leurs redirections, et sa propre liste chainee de redirections de fichiers.
+**
+** Retourne la tete de la liste chainee des commandes pretes a l'execution.
+** ============================================================================
+*/
 t_cmd	*parser(t_token *t)
 {
 	t_cmd	*head;

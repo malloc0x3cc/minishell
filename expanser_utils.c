@@ -6,12 +6,25 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 13:18:39 by madelwau          #+#    #+#             */
-/*   Updated: 2026/07/16 13:35:08 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/07/16 14:07:38 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+/*
+** ============================================================================
+** get_env_value
+** ============================================================================
+** Cherche une variable d'environnement spécifique dans le tableau env et
+** renvoie un pointeur vers sa valeur (la partie située juste après le '=').
+**
+** Si la variable demandée n'existe pas ou si l'un des paramètres est nul,
+** on renvoie une chaîne vide ("") plutôt que NULL. Cela évite d'avoir à
+** blinder l'appelant avec des vérifications de pointeurs et simplifie la
+** concaténation (coller une chaîne vide n'altère pas le résultat final).
+** ============================================================================
+*/
 char	*get_env_value(char *var, char **env)
 {
 	int		i;
@@ -30,11 +43,39 @@ char	*get_env_value(char *var, char **env)
 	return ("");
 }
 
+/*
+** ============================================================================
+** is_var_char
+** ============================================================================
+** Petite fonction utilitaire qui détermine si un caractère est valide pour
+** composer le nom d'une variable d'environnement sous Bash.
+**
+** Les caractères autorisés après le '$' initial sont les lettres (majuscules/
+** minuscules), les chiffres, et le caractère de soulignement '_'.
+** Retourne 1 (vrai) si c'est le cas, 0 (faux) sinon.
+** ============================================================================
+*/
 int	is_var_char(char c)
 {
 	return (ft_isalnum(c) || c == '_');
 }
 
+/*
+** ============================================================================
+** get_var_name_len
+** ============================================================================
+** Calcule la longueur du nom de la variable d'environnement qui commence
+** à l'adresse mémoire donnée par str.
+**
+** Cas particulier :
+**   Si le premier caractère est '?', la longueur est immédiatement de 1,
+**   car "$?" est une variable spéciale qui ne peut pas être suivie d'autres
+**   caractères de variables standard (on ne cherche pas à parser "$?_var").
+**   Sinon, on avance tant que les caractères sont validés par is_var_char().
+**
+** Retourne la longueur exacte du nom de la variable.
+** ============================================================================
+*/
 size_t	get_var_name_len(char *str)
 {
 	size_t	i;
@@ -47,6 +88,19 @@ size_t	get_var_name_len(char *str)
 	return (i);
 }
 
+/*
+** ============================================================================
+** insert_status_value
+** ============================================================================
+** Convertit le code de retour 'last_status' (un entier) en chaîne de
+** caractères via ft_itoa(), puis l'injecte dans la chaîne de destination 'dest'
+** à l'index pointé par 'j'.
+**
+** Cette fonction s'occupe également de libérer la mémoire allouée temporairement
+** par ft_itoa() pour la conversion et de mettre à jour la variable d'index 'j'
+** de l'appelant par effet de bord (via le pointeur *j).
+** ============================================================================
+*/
 void	insert_status_value(char *dest, size_t *j, int last_status)
 {
 	char	*status_str;
@@ -63,6 +117,26 @@ void	insert_status_value(char *dest, size_t *j, int last_status)
 	free(status_str);
 }
 
+/*
+** ============================================================================
+** add_var_len
+** ============================================================================
+** Calcule la longueur réelle de la valeur d'une variable d'environnement (ou de
+** la variable spéciale $?) afin d'aider get_expanded_len() à déterminer la
+** taille globale de la chaîne après expansion.
+**
+** Fonctionnement :
+**   1. Si on détecte un '?' après le '$' (donc à l'index *i + 1), on convertit
+**      le statut en chaîne pour mesurer sa longueur, puis on fait avancer
+**      l'index global 'i' de 2 caractères (pour sauter le '$' et le '?').
+**   2. Sinon, on extrait le nom de la variable avec ft_substr(), on récupère
+**      sa valeur correspondante via get_env_value(), puis on mesure sa longueur.
+**      L'index global 'i' est alors avancé de 1 + la longueur du nom de la
+**      variable traitée.
+**
+** Retourne la longueur de la valeur de la variable trouvée (0 si elle n'existe pas).
+** ============================================================================
+*/
 size_t	add_var_len(char *str, size_t *i, char **env, int status)
 {
 	char	*var;
