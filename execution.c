@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ghub <ghub@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: gahubert <gahubert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 16:01:26 by gahubert          #+#    #+#             */
-/*   Updated: 2026/07/11 14:20:44 by ghub             ###   ########.fr       */
+/*   Updated: 2026/08/07 15:22:07 by gahubert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ static pid_t	fork_and_exec(t_cmd *cmd, char **env, t_exec *ex)
 {
 	pid_t	pid;
 	t_fds	fds;
-	
+
 	pid = fork();
 	if (pid == -1)
 		return (perror("fork"), -1);
