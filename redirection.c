@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/07 15:52:25 by ghub              #+#    #+#             */
-/*   Updated: 2026/07/15 18:20:41 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/08/11 15:23:22 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ static int	open_redir_fd(t_redir *redir)
 		return (open(redir->name, O_WRONLY | O_CREAT | O_APPEND, 0644));
 	if (redir->type == REDIR_IN)
 		return (open(redir->name, O_RDONLY));
-	return (-1);
+	return (-2);
 }
 
 int	apply_redirs(t_redir *redir)
@@ -30,15 +30,18 @@ int	apply_redirs(t_redir *redir)
 
 	while (redir)
 	{
-		fd = open_redir_fd(redir);
-		if (fd == -1)
-			return (perror(redir->name), 1);
-		target = STDIN_FILENO;
-		if (redir->type == REDIR_OUT || redir->type == REDIR_APPEND)
-			target = STDOUT_FILENO;
-		if (dup2(fd, target) == -1)
-			return (close(fd), perror("dup2"), 1);
-		close(fd);
+		if (redir->type != REDIR_HEREDOC)
+		{
+			fd = open_redir_fd(redir);
+			if (fd == -1)
+				return (perror(redir->name), 1);
+			target = STDIN_FILENO;
+			if (redir->type == REDIR_OUT || redir->type == REDIR_APPEND)
+				target = STDOUT_FILENO;
+			if (dup2(fd, target) == -1)
+				return (close(fd), perror("dup2"), 1);
+			close(fd);
+		}
 		redir = redir->next;
 	}
 	return (0);

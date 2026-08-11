@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ghub <ghub@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/16 14:43:36 by gahubert          #+#    #+#             */
-/*   Updated: 2026/07/11 14:18:08 by ghub             ###   ########.fr       */
+/*   Updated: 2026/08/11 15:22:49 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,23 +81,21 @@ static int	read_heredoc(char *delim)
 */
 static int	read_cmd_heredocs(t_cmd *cmd, int *hd_fd)
 {
-	int	j;
+	t_redir	*redir;
 
 	*hd_fd = -1;
-	j = 0;
-	while (cmd->args[j])
+	redir = cmd->redirs;
+	while (redir)
 	{
-		if (ft_strcmp(cmd->args[j], "<<") == 0 && cmd->args[j + 1])
+		if (redir->type == REDIR_HEREDOC)
 		{
 			if (*hd_fd != -1)
 				close(*hd_fd);
-			*hd_fd = read_heredoc(cmd->args[j + 1]);
+			*hd_fd = read_heredoc(redir->name);
 			if (*hd_fd == -1)
 				return (1);
-			j += 2;
 		}
-		else
-			j++;
+		redir = redir->next;
 	}
 	return (0);
 }
