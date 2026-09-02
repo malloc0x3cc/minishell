@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/07 15:48:58 by ghub              #+#    #+#             */
-/*   Updated: 2026/09/02 19:28:04 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/02 20:23:18 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,4 +90,22 @@ int	setup_pipe(t_cmd *cmd, t_exec *ex)
 	else
 		ex->pipe_fd[1] = STDOUT_FILENO;
 	return (0);
+}
+
+int	exec_empty_cmd_redirs(t_redir *redirs)
+{
+	int	saved_in;
+	int	saved_out;
+	int	status;
+
+	saved_in = dup(STDIN_FILENO);
+	saved_out = dup(STDOUT_FILENO);
+	if (saved_in == -1 || saved_out == -1)
+		return (1);
+	status = apply_redirs(redirs);
+	dup2(saved_in, STDIN_FILENO);
+	dup2(saved_out, STDOUT_FILENO);
+	close(saved_in);
+	close(saved_out);
+	return (status);
 }

@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:01:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/09/02 20:17:15 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/02 20:23:56 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,6 +143,7 @@ int		handle_heredocs(t_cmd *cmd, int *hd_fds);
 char	*find_path(char *cmd, char **env);
 int		apply_redirs(t_redir *redir);
 int		setup_pipe(t_cmd *cmd, t_exec *ex);
+int		exec_empty_cmd_redirs(t_redir *redirs);
 
 /* Return code */
 extern int	g_received_signal;

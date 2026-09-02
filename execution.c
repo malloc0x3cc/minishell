@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 16:01:26 by gahubert          #+#    #+#             */
-/*   Updated: 2026/09/02 19:29:34 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/02 20:23:35 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,7 +149,7 @@ int	execute(t_cmd *cmd, char ***env)
 	if (hd_ret != 0)
 		return (free(ex.hd_fds), (hd_ret == 130) * 130 + (hd_ret != 130));
 	if (!cmd->next && (!cmd->args || !cmd->args[0] || !cmd->args[0][0]))
-		return (free(ex.hd_fds), apply_redirs(cmd->redirs));
+		return (free(ex.hd_fds), exec_empty_cmd_redirs(cmd->redirs));
 	if (!cmd->next && cmd->args && *cmd->args && is_parent_builtin(*cmd->args))
 		return (free(ex.hd_fds),
 			exec_single_parent_builtin(cmd, env, ex.hd_fds[0]));
