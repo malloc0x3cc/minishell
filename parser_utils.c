@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/02 19:35:18 by madelwau          #+#    #+#             */
-/*   Updated: 2026/09/02 19:35:30 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/02 20:15:56 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,4 +61,18 @@ int	check_syntax(t_token *t)
 		t = t->next;
 	}
 	return (0);
+}
+
+int	is_all_spaces(char *s)
+{
+	int	i;
+
+	i = 0;
+	while (s[i])
+	{
+		if (!ft_isspace(s[i]))
+			return (0);
+		i++;
+	}
+	return (1);
 }

@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:01:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/09/02 19:49:47 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/02 20:17:15 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,6 +97,7 @@ void	add_token(t_token **head, t_token *new);
 /* parser */
 t_cmd	*parser(t_token *t);
 int		check_syntax(t_token *t);
+int		is_all_spaces(char *s);
 /* expanser */
 void	expanser(t_token *tokens, char **env, int last_status);
 /* expanser_utils */

@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:00:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/09/02 19:40:20 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/02 20:16:49 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,14 +145,13 @@ static int	shell_loop(char *input, char ***env, int last_status)
 	t_cmd	*cmds;
 
 	add_history(input);
+	if (is_all_spaces(input))
+		return (last_status);
 	tokens = lexer(input);
 	if (!tokens)
 		return (2);
 	if (check_syntax(tokens) != 0)
-	{
-		free_tokens(tokens);
-		return (2);
-	}
+		return (free_tokens(tokens), 2);
 	expanser(tokens, *env, last_status);
 	remove_quotes(tokens);
 	tokens = filter_empty_tokens(tokens);
@@ -161,9 +160,7 @@ static int	shell_loop(char *input, char ***env, int last_status)
 	cmds = parser(tokens);
 	if (cmds)
 		last_status = execute(cmds, env);
-	free_tokens(tokens);
-	free_cmds(cmds);
-	return (last_status);
+	return (free_tokens(tokens), free_cmds(cmds), last_status);
 }
 
 /*
