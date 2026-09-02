@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/11 13:52:13 by ghub              #+#    #+#             */
-/*   Updated: 2026/09/02 19:22:28 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/02 22:49:21 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,7 +147,7 @@ static void	exec_cmd(t_cmd *cmd, char **env)
 
 	if (apply_redirs(cmd->redirs) != 0)
 		exit(1);
-	if (!cmd->args || !cmd->args[0]|| !cmd->args[0][0])
+	if (!cmd->args || !cmd->args[0] || !cmd->args[0][0])
 		exit(0);
 	if (is_builtin(cmd->args[0]))
 		exit(exec_builtin(cmd, &env));
