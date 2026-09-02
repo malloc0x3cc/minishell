@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/10 11:07:22 by madelwau          #+#    #+#             */
-/*   Updated: 2026/07/23 19:57:48 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/02 19:39:32 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,9 +69,9 @@ static int	check_redir_syntax(char *s)
 		count++;
 	if (count > 2 || (c == '|' && count > 1))
 	{
-		ft_putstr_fd("minishell: syntax error near unexpected token '", 2);
+		ft_putstr_fd("minishell: syntax error near unexpected token `", 2);
 		ft_putchar_fd(c, 2);
-		ft_putstr_fd("'\n", 2);
+		ft_putendl_fd("'", 2);
 		return (-1);
 	}
 	return (count);

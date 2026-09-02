@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/02 07:46:41 by madelwau          #+#    #+#             */
-/*   Updated: 2026/09/02 07:46:42 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/02 19:17:36 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,8 @@ int	builtin_exit(char **args)
 {
 	int	exit_code;
 
-	ft_putendl_fd("exit", STDERR_FILENO);
+	if (isatty(STDIN_FILENO))
+		ft_putendl_fd("exit", STDERR_FILENO);
 	if (!args[1])
 		exit(0);
 	if (!is_numeric(args[1]))
@@ -49,7 +50,7 @@ int	builtin_exit(char **args)
 	if (args[2])
 	{
 		ft_putendl_fd("minishell: exit: too many arguments", 2);
-		return (1);
+		return (2);
 	}
 	exit_code = ft_atoi(args[1]);
 	exit((unsigned char)exit_code);

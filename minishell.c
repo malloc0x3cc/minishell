@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:00:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/09/02 07:32:39 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/02 19:40:20 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,41 @@ static void	remove_quotes(t_token *tokens)
 
 /*
 ** ============================================================================
+** filter_empty_tokens
+** ============================================================================
+** Supprime les tokens devenus vides suite a l'expansion d'une variable
+** qui n'etait pas protegee par des quotes (ex: $EMPTY).
+** ============================================================================
+*/
+static t_token	*filter_empty_tokens(t_token *tokens)
+{
+	t_token	*cur;
+	t_token	*prev;
+	t_token	*next;
+
+	cur = tokens;
+	prev = NULL;
+	while (cur)
+	{
+		next = cur->next;
+		if (cur->type == TOKEN_WORD && cur->str && cur->str[0] == '\0')
+		{
+			if (prev)
+				prev->next = next;
+			else
+				tokens = next;
+			free(cur->str);
+			free(cur);
+		}
+		else
+			prev = cur;
+		cur = next;
+	}
+	return (tokens);
+}
+
+/*
+** ============================================================================
 ** shell_loop
 ** ============================================================================
 ** Execute le cycle de vie complet d'une ligne de commande saisie :
@@ -111,19 +146,21 @@ static int	shell_loop(char *input, char ***env, int last_status)
 
 	add_history(input);
 	tokens = lexer(input);
+	if (!tokens)
+		return (2);
+	if (check_syntax(tokens) != 0)
+	{
+		free_tokens(tokens);
+		return (2);
+	}
 	expanser(tokens, *env, last_status);
 	remove_quotes(tokens);
+	tokens = filter_empty_tokens(tokens);
+	if (!tokens)
+		return (0);
 	cmds = parser(tokens);
 	if (cmds)
-	{
 		last_status = execute(cmds, env);
-		if (g_received_signal == SIGINT)
-		{
-			write(1, "\n", 1);
-			rl_on_new_line();
-			rl_replace_line("", 0);
-		}
-	}
 	free_tokens(tokens);
 	free_cmds(cmds);
 	return (last_status);

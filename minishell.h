@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:01:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/09/02 07:59:03 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/02 19:49:47 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 # include <readline/history.h>
 # include "libft/inc/libft.h"
 
-# define PROMPT "sixsevenshell> "
+# define PROMPT "sixseven$HELL> "
 
 typedef enum e_token_type
 {
@@ -96,6 +96,7 @@ t_token	*create_token(char *str, t_token_type type);
 void	add_token(t_token **head, t_token *new);
 /* parser */
 t_cmd	*parser(t_token *t);
+int		check_syntax(t_token *t);
 /* expanser */
 void	expanser(t_token *tokens, char **env, int last_status);
 /* expanser_utils */
@@ -104,11 +105,15 @@ int		is_var_char(char c);
 size_t	get_var_name_len(char *str);
 void	insert_status_value(char *dest, size_t *j, int last_status);
 size_t	add_var_len(char *str, size_t *i, char **env, int status);
-/* signals */
+/* signal */
 void	init_signals(void);
 void	set_signals_for_exec(void);
 void	reset_signals_for_child(void);
 void	set_signals_for_heredoc(void);
+/* signal handlers */
+void	handle_sigint_prompt(int sig);
+void	handle_sigint_exec(int sig);
+void	handle_sigint_heredoc(int sig);
 /* env utils */
 int		env_size(char **env);
 void	free_env(char **env);
@@ -130,13 +135,13 @@ int		builtin_unset(char **args, char ***env);
 int		builtin_exit(char **args);
 /* execution */
 int		execute(t_cmd *cmd, char ***env);
-int		wait_children(pid_t pid, int *status);
+int		wait_children(pid_t pid);
 int		count_cmds(t_cmd *cmd);
 void	child_exec(t_cmd *cmd, t_fds *fds, char **env);
 int		handle_heredocs(t_cmd *cmd, int *hd_fds);
-// char	**clean_args(char **args);
 char	*find_path(char *cmd, char **env);
 int		apply_redirs(t_redir *redir);
+int		setup_pipe(t_cmd *cmd, t_exec *ex);
 
 /* Return code */
 extern int	g_received_signal;

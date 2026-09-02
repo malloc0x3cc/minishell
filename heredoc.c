@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/16 14:43:36 by gahubert          #+#    #+#             */
-/*   Updated: 2026/09/02 07:59:45 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/02 18:32:07 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,16 +54,12 @@ static int	read_heredoc(char *delim)
 	{
 		line = readline("> ");
 		if (!line || ft_strcmp(line, delim) == 0 || g_received_signal == SIGINT)
-		{
-			free(line);
 			break ;
-		}
-		ft_putstr_fd(line, pipe_fd[1]);
-		ft_putstr_fd("\n", pipe_fd[1]);
+		ft_putendl_fd(line, pipe_fd[1]);
 		free(line);
 	}
-	dup2(saved_stdin, STDIN_FILENO);
-	close(saved_stdin);
+	free(line);
+	(dup2(saved_stdin, STDIN_FILENO), close(saved_stdin));
 	init_signals();
 	close(pipe_fd[1]);
 	if (g_received_signal == SIGINT)
@@ -159,12 +155,9 @@ int	handle_heredocs(t_cmd *cmd, int *hd_fds)
 		if (read_cmd_heredocs(cmd, &hd_fds[i]) != 0)
 		{
 			close_heredocs(hd_fds, i);
+			if (g_received_signal == SIGINT)
+				return (130);
 			return (1);
-		}
-		if (g_received_signal == SIGINT)
-		{
-			close_heredocs(hd_fds, i + 1);
-			return (130);
 		}
 		i++;
 		cmd = cmd->next;

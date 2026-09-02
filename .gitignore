@@ -61,3 +61,4 @@ minishell
 .vscode/
 .DS_Store/
 valgrindignore.supp
+minishell_tester/

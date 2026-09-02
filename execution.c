@@ -6,33 +6,11 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 16:01:26 by gahubert          #+#    #+#             */
-/*   Updated: 2026/09/02 08:06:37 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/02 19:29:34 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-/*
-** ============================================================================
-** setup_pipe
-** ============================================================================
-** Prepare le pipe pour la commande courante :
-**   - S'il y a une commande suivante (cmd->next), on cree un vrai pipe.
-**   - Sinon (derniere commande de la chaine), la sortie doit aller vers
-**     le stdout du shell : on force pipe_fd[1] a STDOUT_FILENO.
-** Retourne 0 si OK, 1 si pipe() a echoue.
-** ============================================================================
-*/
-static int	setup_pipe(t_cmd *cmd, t_exec *ex)
-{
-	if (cmd->next)
-	{
-		if (pipe(ex->pipe_fd) == -1)
-			return (perror("pipe"), 1);
-	}
-	else
-		ex->pipe_fd[1] = STDOUT_FILENO;
-	return (0);
-}
 
 /*
 ** ============================================================================
@@ -124,6 +102,30 @@ static pid_t	run_pipeline(t_cmd *cmd, char **env, t_exec *ex)
 
 /*
 ** ============================================================================
+** run_and_wait
+** ============================================================================
+** Initialise l'etat d'execution, lance le pipeline et attend les enfants.
+** ============================================================================
+*/
+static int	run_and_wait(t_cmd *cmd, char **env, t_exec *ex)
+{
+	pid_t	pid;
+	int		status;
+
+	set_signals_for_exec();
+	ex->in_fd = STDIN_FILENO;
+	ex->idx = 0;
+	pid = run_pipeline(cmd, env, ex);
+	free(ex->hd_fds);
+	if (pid == -1)
+		return (init_signals(), 1);
+	status = wait_children(pid);
+	init_signals();
+	return (status);
+}
+
+/*
+** ============================================================================
 ** execute
 ** ============================================================================
 ** Point d'entree principal de l'execution d'un pipeline.
@@ -138,34 +140,18 @@ static pid_t	run_pipeline(t_cmd *cmd, char **env, t_exec *ex)
 int	execute(t_cmd *cmd, char ***env)
 {
 	t_exec	ex;
-	int		status;
 	int		hd_ret;
-	pid_t	pid;
 
 	ex.hd_fds = malloc(sizeof(int) * count_cmds(cmd));
 	if (!ex.hd_fds)
 		return (1);
 	hd_ret = handle_heredocs(cmd, ex.hd_fds);
 	if (hd_ret != 0)
-	{
-		free(ex.hd_fds);
-		if (hd_ret == 130)
-			return (130);
-		return (1);
-	}
-	if (!cmd->next && cmd->args && cmd->args[0] && is_parent_builtin(cmd->args[0]))
-	{
-		status = exec_single_parent_builtin(cmd, env, ex.hd_fds[0]);
-		free(ex.hd_fds);
-		return (status);
-	}
-	set_signals_for_exec();
-	ex.in_fd = STDIN_FILENO;
-	ex.idx = 0;
-	pid = run_pipeline(cmd, *env, &ex);
-	free(ex.hd_fds);
-	if (pid == -1)
-		return (init_signals(), 1);
-	status = wait_children(pid, &status);
-	return (init_signals(), status);
+		return (free(ex.hd_fds), (hd_ret == 130) * 130 + (hd_ret != 130));
+	if (!cmd->next && (!cmd->args || !cmd->args[0] || !cmd->args[0][0]))
+		return (free(ex.hd_fds), apply_redirs(cmd->redirs));
+	if (!cmd->next && cmd->args && *cmd->args && is_parent_builtin(*cmd->args))
+		return (free(ex.hd_fds),
+			exec_single_parent_builtin(cmd, env, ex.hd_fds[0]));
+	return (run_and_wait(cmd, *env, &ex));
 }

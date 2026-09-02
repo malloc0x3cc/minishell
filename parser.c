@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/19 11:09:03 by madelwau          #+#    #+#             */
-/*   Updated: 2026/07/16 14:14:11 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/02 19:10:14 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,12 @@ static size_t	count_tokens(t_token *t)
 	i = 0;
 	while (t && t->type != TOKEN_PIPE)
 	{
-		if (t->type == TOKEN_WORD)
+		if (t->type != TOKEN_WORD)
+		{
+			if (t->next)
+				t = t->next;
+		}
+		else
 			i++;
 		t = t->next;
 	}

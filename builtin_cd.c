@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/02 07:46:24 by madelwau          #+#    #+#             */
-/*   Updated: 2026/09/02 07:46:25 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/02 18:50:42 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ int	builtin_cd(char **args, char ***env)
 	if (args[1] && args[2])
 	{
 		ft_putstr_fd("minishell: cd: too many arguments\n", 2);
-		return (1);
+		return (2);
 	}
 	if (!getcwd(old_pwd, sizeof(old_pwd)))
 		old_pwd[0] = '\0';

@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/07 15:48:58 by ghub              #+#    #+#             */
-/*   Updated: 2026/09/02 08:03:36 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/02 19:28:04 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,50 +37,57 @@ int	count_cmds(t_cmd *cmd)
 ** ============================================================================
 ** wait_children
 ** ============================================================================
-** Attend la fin de TOUS les processus enfants lances (utile pour les
-** pipelines a plusieurs commandes, ou chaque commande est un enfant).
-** waitpid(-1, ...) attend n'importe quel enfant, un par un, jusqu'a ce
-** qu'il n'y en ait plus (retour -1, typiquement ECHILD).
-**
-** BUG CORRIGE : l'ancienne version gardait le *status du DERNIER enfant
-** REAPE, c'est-a-dire celui qui termine en dernier dans le temps reel.
-** Or l'ordre de fin des processus ne correspond pas forcement a l'ordre
-** des commandes dans le pipeline (ex: "sleep 1 | false" : "false" finit
-** quasi instantanement, "sleep" finit 1 seconde plus tard, alors que le
-** code de sortie du PIPELINE doit etre celui de "false", la derniere
-** commande, comme le fait bash).
-**
-** On boucle toujours sur TOUS les enfants pour n'en laisser aucun en
-** zombie, mais on ne memorise le status que lorsque le pid reape
-** correspond exactement a last_pid (le pid de la derniere commande du
-** pipeline, transmis par run_pipeline()).
-**
-** Retourne le code de sortie de last_pid : converti via WEXITSTATUS() si
-** le processus s'est termine normalement, ou 128 + numero de signal s'il
-** a ete tue par un signal (convention shell standard), 1 par defaut.
+** Attend tous les enfants et extrait le vrai code de sortie (0-255)
+** du dernier processus execute grace aux macros POSIX WEXITSTATUS / WTERMSIG.
 ** ============================================================================
 */
-int	wait_children(pid_t last_pid, int *status)
+int	wait_children(pid_t last_pid)
 {
 	pid_t	pid;
-	int		tmp_status;
+	int		status;
+	int		last_status;
 
-	*status = 0;
+	last_status = 0;
 	while (1)
 	{
-		pid = waitpid(-1, &tmp_status, 0);
+		pid = waitpid(-1, &status, 0);
 		if (pid == -1)
 			break ;
 		if (pid == last_pid)
-			*status = tmp_status;
+			last_status = status;
 	}
-	if (WIFEXITED(*status))
-		return (WEXITSTATUS(*status));
-	if (WIFSIGNALED(*status))
+	if (WIFEXITED(last_status))
+		return (WEXITSTATUS(last_status));
+	if (WIFSIGNALED(last_status))
 	{
-		if (WTERMSIG(*status) == SIGQUIT)
+		if (WTERMSIG(last_status) == SIGQUIT)
 			ft_putendl_fd("Quit (core dumped)", STDERR_FILENO);
-		return (128 + WTERMSIG(*status));
+		else if (WTERMSIG(last_status) == SIGINT)
+			ft_putchar_fd('\n', STDERR_FILENO);
+		return (128 + WTERMSIG(last_status));
 	}
 	return (1);
+}
+
+/*
+** ============================================================================
+** setup_pipe
+** ============================================================================
+** Prepare le pipe pour la commande courante :
+**   - S'il y a une commande suivante (cmd->next), on cree un vrai pipe.
+**   - Sinon (derniere commande de la chaine), la sortie doit aller vers
+**     le stdout du shell : on force pipe_fd[1] a STDOUT_FILENO.
+** Retourne 0 si OK, 1 si pipe() a echoue.
+** ============================================================================
+*/
+int	setup_pipe(t_cmd *cmd, t_exec *ex)
+{
+	if (cmd->next)
+	{
+		if (pipe(ex->pipe_fd) == -1)
+			return (perror("pipe"), 1);
+	}
+	else
+		ex->pipe_fd[1] = STDOUT_FILENO;
+	return (0);
 }

@@ -6,7 +6,7 @@
 #    By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/06/04 12:58:29 by madelwau          #+#    #+#              #
-#    Updated: 2026/09/02 17:19:30 by madelwau         ###   ########.fr        #
+#    Updated: 2026/09/02 19:37:58 by madelwau         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,8 +24,8 @@ LIBS	:= -L$(LFT_DIR) -lft -lreadline
 
 SRCS	:= minishell.c find_path.c heredoc.c redirection.c \
 			execution.c execution_children.c execution_utils.c \
-			env_utils.c lexer.c lexer_utils.c parser.c expanser.c \
-			expanser_utils.c signals.c execution_parent.c \
+			env_utils.c lexer.c lexer_utils.c parser.c parser_utils.c \
+			expanser.c expanser_utils.c signal.c signal_handlers.c execution_parent.c \
 			builtin_cd.c builtin_dispatcher.c builtin_echo_pwd_env.c \
 			builtin_exit.c builtin_export_unset.c
 MODE	:= mandatory
