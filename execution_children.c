@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/11 13:52:13 by ghub              #+#    #+#             */
-/*   Updated: 2026/07/16 12:08:58 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/02 07:41:12 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,6 +119,8 @@ static void	exec_cmd(t_cmd *cmd, char **env)
 		exit(1);
 	if (!cmd->args || !cmd->args[0])
 		exit(0);
+	if (is_builtin(cmd->args[0]))
+		exit(exec_builtin(cmd, &env));
 	path = find_path(cmd->args[0], env);
 	if (!path)
 		cmd_not_found(cmd->args[0]);

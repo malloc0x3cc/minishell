@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:01:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/09/02 07:31:45 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/02 07:48:35 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,20 @@ int		env_size(char **env);
 void	free_env(char **env);
 char	**dup_env(char **env);
 int		set_env_val(char *key_value, char ***env);
-
+int		unset_env_val(char *key, char ***env);
+/* builtin dispatcher & execution */
+int		is_parent_builtin(char *cmd);
+int		is_builtin(char *cmd);
+int		exec_builtin(t_cmd *cmd, char ***env);
+int		exec_single_parent_builtin(t_cmd *cmd, char ***env, int hd_fd);
+/* builtins */
+int		builtin_echo(char **args);
+int		builtin_pwd(void);
+int		builtin_env(char **env);
+int		builtin_cd(char **args, char ***env);
+int		builtin_export(char **args, char ***env);
+int		builtin_unset(char **args, char ***env);
+int		builtin_exit(char **args);
 /* execution */
 int		execute(t_cmd *cmd, char ***env);
 int		wait_children(pid_t pid, int *status);

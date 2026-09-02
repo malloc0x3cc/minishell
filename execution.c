@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 16:01:26 by gahubert          #+#    #+#             */
-/*   Updated: 2026/09/02 07:33:19 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/02 07:40:37 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,6 +146,13 @@ int	execute(t_cmd *cmd, char ***env)
 		return (1);
 	if (handle_heredocs(cmd, ex.hd_fds) != 0)
 		return (free(ex.hd_fds), 1);
+	if (!cmd->next && cmd->args && cmd->args[0]
+		&& is_parent_builtin(cmd->args[0]))
+	{
+		status = exec_single_parent_builtin(cmd, env, ex.hd_fds[0]);
+		free(ex.hd_fds);
+		return (status);
+	}
 	set_signals_for_exec();
 	ex.in_fd = STDIN_FILENO;
 	ex.idx = 0;
