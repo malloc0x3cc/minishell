@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:01:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/07/16 13:35:18 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/02 07:31:45 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,8 +108,14 @@ size_t	add_var_len(char *str, size_t *i, char **env, int status);
 void	init_signals(void);
 void	set_signals_for_exec(void);
 void	reset_signals_for_child(void);
+/* env utils */
+int		env_size(char **env);
+void	free_env(char **env);
+char	**dup_env(char **env);
+int		set_env_val(char *key_value, char ***env);
+
 /* execution */
-int		execute(t_cmd *cmd, char **env);
+int		execute(t_cmd *cmd, char ***env);
 int		wait_children(pid_t pid, int *status);
 int		count_cmds(t_cmd *cmd);
 void	child_exec(t_cmd *cmd, t_fds *fds, char **env);

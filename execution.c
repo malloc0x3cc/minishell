@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 16:01:26 by gahubert          #+#    #+#             */
-/*   Updated: 2026/07/16 12:43:42 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/02 07:33:19 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,7 +135,7 @@ static pid_t	run_pipeline(t_cmd *cmd, char **env, t_exec *ex)
 **      de sortie du dernier via wait_children().
 ** ============================================================================
 */
-int	execute(t_cmd *cmd, char **env)
+int	execute(t_cmd *cmd, char ***env)
 {
 	t_exec	ex;
 	int		status;
@@ -149,7 +149,7 @@ int	execute(t_cmd *cmd, char **env)
 	set_signals_for_exec();
 	ex.in_fd = STDIN_FILENO;
 	ex.idx = 0;
-	pid = run_pipeline(cmd, env, &ex);
+	pid = run_pipeline(cmd, *env, &ex);
 	free(ex.hd_fds);
 	if (pid == -1)
 		return (init_signals(), 1);

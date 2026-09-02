@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:00:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/07/16 14:11:59 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/02 07:32:39 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,14 +104,14 @@ static void	remove_quotes(t_token *tokens)
 ** dernier status d'execution obtenu.
 ** ============================================================================
 */
-static int	shell_loop(char *input, char **env, int last_status)
+static int	shell_loop(char *input, char ***env, int last_status)
 {
 	t_token	*tokens;
 	t_cmd	*cmds;
 
 	add_history(input);
 	tokens = lexer(input);
-	expanser(tokens, env, last_status);
+	expanser(tokens, *env, last_status);
 	remove_quotes(tokens);
 	cmds = parser(tokens);
 	if (cmds)
@@ -148,12 +148,16 @@ static int	shell_loop(char *input, char **env, int last_status)
 ** Libere l'historique readline avant de retourner le code de sortie final.
 ** ============================================================================
 */
-int	main(int ac, char **av, char **env)
+int	main(int ac, char **av, char **envp)
 {
 	char	*input;
+	char	**my_env;
 	int		last_status;
 
 	((void) ac, (void) av);
+	my_env = dup_env(envp);
+	if (!my_env)
+		return (1);
 	init_signals();
 	last_status = 0;
 	while (1)
@@ -163,9 +167,10 @@ int	main(int ac, char **av, char **env)
 		if (!input)
 			break ;
 		if (*input)
-			last_status = shell_loop(input, env, last_status);
+			last_status = shell_loop(input, &my_env, last_status);
 		free(input);
 	}
 	rl_clear_history();
-	return (0);
+	free_env(my_env);
+	return (last_status);
 }
