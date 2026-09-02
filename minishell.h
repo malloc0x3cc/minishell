@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:01:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/09/02 20:23:56 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/02 20:34:47 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 # include <readline/history.h>
 # include "libft/inc/libft.h"
 
-# define PROMPT "sixseven$HELL> "
+# define PROMPT "mini$HELL> "
 
 typedef enum e_token_type
 {
