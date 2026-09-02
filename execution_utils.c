@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution_utils.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ghub <ghub@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/07 15:48:58 by ghub              #+#    #+#             */
-/*   Updated: 2026/07/11 14:34:50 by ghub             ###   ########.fr       */
+/*   Updated: 2026/09/02 08:03:36 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,10 @@ int	wait_children(pid_t last_pid, int *status)
 	if (WIFEXITED(*status))
 		return (WEXITSTATUS(*status));
 	if (WIFSIGNALED(*status))
+	{
+		if (WTERMSIG(*status) == SIGQUIT)
+			ft_putendl_fd("Quit (core dumped)", STDERR_FILENO);
 		return (128 + WTERMSIG(*status));
+	}
 	return (1);
 }

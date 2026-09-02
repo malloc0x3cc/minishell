@@ -6,11 +6,12 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/11 13:52:13 by ghub              #+#    #+#             */
-/*   Updated: 2026/09/02 07:41:12 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/02 07:55:59 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include <sys/stat.h>
 
 /*
 ** ============================================================================
@@ -80,12 +81,36 @@ static void	setup_fds(t_fds *fds)
 ** d'un message d'erreur.
 ** ============================================================================
 */
-static void	cmd_not_found(char *name)
+static void	handle_exec_error(char *path, char *cmd_name)
 {
-	ft_putstr_fd("minishell: command not found: ", 2);
-	ft_putstr_fd(name, 2);
-	ft_putchar_fd('\n', 2);
-	exit(127);
+	struct stat	path_stat;
+
+	if (!path)
+	{
+		ft_putstr_fd("minishell: ", 2);
+		ft_putstr_fd(cmd_name, 2);
+		ft_putendl_fd(": command not found", 2);
+		exit(127);
+	}
+	if (stat(path, &path_stat) == 0 && S_ISDIR(path_stat.st_mode))
+	{
+		ft_putstr_fd("minishell: ", 2);
+		ft_putstr_fd(path, 2);
+		ft_putendl_fd(": Is a directory", 2);
+		free(path);
+		exit(126);
+	}
+	if (access(path, F_OK) != 0)
+	{
+		ft_putstr_fd("minishell: ", 2);
+		perror(path);
+		free(path);
+		exit(127);
+	}
+	ft_putstr_fd("minishell: ", 2);
+	perror(path);
+	free(path);
+	exit(126);
 }
 
 /*
@@ -122,12 +147,13 @@ static void	exec_cmd(t_cmd *cmd, char **env)
 	if (is_builtin(cmd->args[0]))
 		exit(exec_builtin(cmd, &env));
 	path = find_path(cmd->args[0], env);
-	if (!path)
-		cmd_not_found(cmd->args[0]);
+	if (!path || ft_strchr(cmd->args[0], '/'))
+	{
+		if (!path || access(path, F_OK) != 0)
+			handle_exec_error(path, cmd->args[0]);
+	}
 	execve(path, cmd->args, env);
-	perror(path);
-	free(path);
-	exit(1);
+	handle_exec_error(path, cmd->args[0]);
 }
 
 /*

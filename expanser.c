@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 12:05:14 by madelwau          #+#    #+#             */
-/*   Updated: 2026/07/16 14:19:22 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/02 08:17:56 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,8 @@ static size_t	get_expanded_len(char *str, char **env, int last_status)
 			len += add_var_len(str, &i, env, last_status);
 			continue ;
 		}
-		(void)((len++) + (i++));
+		len++;
+		i++;
 	}
 	return (len);
 }
@@ -95,7 +96,7 @@ static void	sub_var(char *str, char *dest, size_t *i, t_sub_ctx *ctx)
 	var = ft_substr(str, *i + 1, get_var_name_len(str + *i + 1));
 	val = get_env_value(var, ctx->env);
 	k = 0;
-	while (val[k])
+	while (val && val[k])
 		dest[(ctx->j)++] = val[k++];
 	*i += 1 + get_var_name_len(str + *i + 1);
 	free(var);

@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:01:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/09/02 07:48:35 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/02 07:59:03 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,6 +108,7 @@ size_t	add_var_len(char *str, size_t *i, char **env, int status);
 void	init_signals(void);
 void	set_signals_for_exec(void);
 void	reset_signals_for_child(void);
+void	set_signals_for_heredoc(void);
 /* env utils */
 int		env_size(char **env);
 void	free_env(char **env);

@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/15 18:31:51 by madelwau          #+#    #+#             */
-/*   Updated: 2026/07/15 18:32:06 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/02 07:54:09 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,9 +36,9 @@ static char	*get_path_value(char **env)
 	int	i;
 
 	i = 0;
-	while (env[i] && ft_strncmp(env[i], "PATH=", 5) != 0)
+	while (env && env[i] && ft_strncmp(env[i], "PATH=", 5) != 0)
 		i++;
-	if (!env[i])
+	if (!env || !env[i])
 		return (NULL);
 	return (env[i] + 5);
 }
@@ -95,10 +95,10 @@ static char	*search_in_paths(char **paths, char *cmd)
 	char	*full;
 
 	i = 0;
-	while (paths[i])
+	while (paths && paths[i])
 	{
 		full = build_full_path(paths[i], cmd);
-		if (full && access(full, X_OK) == 0)
+		if (full && access(full, F_OK) == 0)
 		{
 			ft_free_tab(paths);
 			return (full);
@@ -141,6 +141,10 @@ char	*find_path(char *cmd, char **env)
 	char	*path_value;
 	char	**paths;
 
+	if (!cmd || !cmd[0])
+		return (NULL);
+	if (ft_strchr(cmd, '/'))
+		return (ft_strdup(cmd));
 	path_value = get_path_value(env);
 	if (!path_value)
 		return (NULL);

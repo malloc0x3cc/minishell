@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/15 12:00:00 by madelwau          #+#    #+#             */
-/*   Updated: 2026/07/16 14:19:45 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/02 07:58:26 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,4 +130,21 @@ void	reset_signals_for_child(void)
 	sa.sa_flags = 0;
 	sigaction(SIGINT, &sa, NULL);
 	sigaction(SIGQUIT, &sa, NULL);
+}
+
+static void	handle_sigint_heredoc(int sig)
+{
+	g_received_signal = sig;
+	write(1, "\n", 1);
+	close(STDIN_FILENO);
+}
+
+void	set_signals_for_heredoc(void)
+{
+	struct sigaction	sa;
+
+	sa.sa_handler = &handle_sigint_heredoc;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+	sigaction(SIGINT, &sa, NULL);
 }
