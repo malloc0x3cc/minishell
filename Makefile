@@ -6,7 +6,7 @@
 #    By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/06/04 12:58:29 by madelwau          #+#    #+#              #
-#    Updated: 2026/09/02 19:37:58 by madelwau         ###   ########.fr        #
+#    Updated: 2026/09/03 07:56:46 by madelwau         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,7 +15,7 @@ SHELL	:=	/bin/sh
 NAME	:= $(strip minishell)
 
 CC		:= cc
-CFLAGS	:= -Wall -Wextra -Werror -I. -MMD -MP
+CFLAGS	:= -Wall -Wextra -Werror -Iinc -MMD -MP
 
 LFT_DIR	:= libft
 LFT		:= $(LFT_DIR)/libft.a
@@ -33,6 +33,8 @@ MODE	:= mandatory
 OBJ_DIR	:= .obj/
 OBJS	:= $(addprefix $(OBJ_DIR), $(SRCS:.c=.o))
 DEPS	:= $(addprefix $(OBJ_DIR), $(SRCS:.c=.d))
+
+VPATH	:= src:src/builtin:src/exec:src/parser_lexer
 
 all: $(NAME)
 
@@ -60,7 +62,7 @@ fclean: clean
 re: fclean all
 
 val: all
-	@valgrind --suppressions=valgrindignore.supp --leak-check=full --show-leak-kinds=all ./$(NAME)
+	@valgrind --suppressions=readline.supp --leak-check=full --show-leak-kinds=all ./$(NAME)
 
 .PHONY: all clean fclean re val
 -include $(DEPS)
