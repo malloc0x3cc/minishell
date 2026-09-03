@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:01:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/09/02 20:34:47 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/03 00:44:13 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 # include <unistd.h>      // fork, dup2, execve, pipe, close
 # include <fcntl.h>       // open, O_RDONLY, O_WRONLY, O_CREAT, O_TRUNC
 # include <sys/wait.h>    // waitpid, WIFEXITED, WEXITSTATUS
+# include <signal.h>
 # include <readline/readline.h>
 # include <readline/history.h>
 # include "libft/inc/libft.h"
@@ -146,6 +147,6 @@ int		setup_pipe(t_cmd *cmd, t_exec *ex);
 int		exec_empty_cmd_redirs(t_redir *redirs);
 
 /* Return code */
-extern int	g_received_signal;
+extern volatile sig_atomic_t	g_received_signal;
 
 #endif

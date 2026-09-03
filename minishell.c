@@ -6,13 +6,13 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:00:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/09/02 20:16:49 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/03 00:50:55 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	g_received_signal = 0;
+volatile sig_atomic_t	g_received_signal = 0;
 
 /*
 ** ============================================================================
