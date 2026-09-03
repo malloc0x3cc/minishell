@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:00:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/09/03 00:50:55 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/03 07:44:20 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,7 +160,9 @@ static int	shell_loop(char *input, char ***env, int last_status)
 	cmds = parser(tokens);
 	if (cmds)
 		last_status = execute(cmds, env);
-	return (free_tokens(tokens), free_cmds(cmds), last_status);
+	free_tokens(tokens);
+	free_cmds(cmds);
+	return (last_status);
 }
 
 /*
@@ -188,13 +190,13 @@ int	main(int ac, char **av, char **envp)
 	char	**my_env;
 	int		last_status;
 
-	((void) ac, (void) av);
+	(void)((void)ac, (void)av);
 	my_env = dup_env(envp);
 	if (!my_env)
 		return (1);
 	init_signals();
 	last_status = 0;
-	while (1)
+	while (last_status >= 0)
 	{
 		g_received_signal = 0;
 		input = readline(PROMPT);
@@ -204,7 +206,7 @@ int	main(int ac, char **av, char **envp)
 			last_status = shell_loop(input, &my_env, last_status);
 		free(input);
 	}
-	rl_clear_history();
-	free_env(my_env);
-	return (last_status);
+	if (last_status < 0)
+		last_status = -(last_status + 256);
+	return (rl_clear_history(), free_env(my_env), last_status);
 }
