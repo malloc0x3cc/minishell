@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 16:01:26 by gahubert          #+#    #+#             */
-/*   Updated: 2026/09/03 07:32:23 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/03 08:17:39 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,7 +155,7 @@ int	execute(t_cmd *cmd, char ***env)
 		return (1);
 	}
 	if (!cmd->next && (!cmd->args || !cmd->args[0] || !cmd->args[0][0]))
-		return (free(ex.hd_fds), apply_redirs(cmd->redirs));
+		return (free(ex.hd_fds), exec_empty_cmd_redirs(cmd->redirs));
 	if (!cmd->next && cmd->args && *cmd->args && is_parent_builtin(*cmd->args))
 	{
 		status = exec_single_parent_builtin(cmd, env, ex.hd_fds[0]);

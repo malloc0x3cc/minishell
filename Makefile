@@ -6,7 +6,7 @@
 #    By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/06/04 12:58:29 by madelwau          #+#    #+#              #
-#    Updated: 2026/09/03 07:56:46 by madelwau         ###   ########.fr        #
+#    Updated: 2026/09/03 08:08:42 by madelwau         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -34,7 +34,7 @@ OBJ_DIR	:= .obj/
 OBJS	:= $(addprefix $(OBJ_DIR), $(SRCS:.c=.o))
 DEPS	:= $(addprefix $(OBJ_DIR), $(SRCS:.c=.d))
 
-VPATH	:= src:src/builtin:src/exec:src/parser_lexer
+VPATH	:= src:src/builtin:src/env:src/exec:src/parser_lexer:src/signal
 
 all: $(NAME)
 
