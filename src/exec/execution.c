@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/09 16:01:26 by gahubert          #+#    #+#             */
-/*   Updated: 2026/09/03 08:17:39 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/10 00:10:16 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,8 @@
 ** Retourne -1 si fork() a echoue.
 ** ============================================================================
 */
-static pid_t	fork_and_exec(t_cmd *cmd, char **env, t_exec *ex)
+static pid_t	fork_and_exec(
+	t_cmd *cmd, char **env, t_exec *ex, t_token *tokens)
 {
 	pid_t	pid;
 	t_fds	fds;
@@ -39,6 +40,8 @@ static pid_t	fork_and_exec(t_cmd *cmd, char **env, t_exec *ex)
 		fds.in_fd = ex->in_fd;
 		fds.out_fd = ex->pipe_fd[1];
 		fds.hd_fd = ex->hd_fds[ex->idx];
+		fds.hd_fds_all = ex->hd_fds;
+		fds.tokens = tokens;
 		child_exec(cmd, &fds, env);
 	}
 	return (pid);
@@ -82,7 +85,8 @@ static void	close_and_advance(t_cmd *cmd, t_exec *ex)
 ** a echoue en cours de route.
 ** ============================================================================
 */
-static pid_t	run_pipeline(t_cmd *cmd, char **env, t_exec *ex)
+static pid_t	run_pipeline(
+	t_cmd *cmd, char **env, t_exec *ex, t_token *tokens)
 {
 	pid_t	pid;
 
@@ -91,7 +95,7 @@ static pid_t	run_pipeline(t_cmd *cmd, char **env, t_exec *ex)
 	{
 		if (setup_pipe(cmd, ex) == 1)
 			return (-1);
-		pid = fork_and_exec(cmd, env, ex);
+		pid = fork_and_exec(cmd, env, ex, tokens);
 		if (pid == -1)
 			return (-1);
 		close_and_advance(cmd, ex);
@@ -107,7 +111,7 @@ static pid_t	run_pipeline(t_cmd *cmd, char **env, t_exec *ex)
 ** Initialise l'etat d'execution, lance le pipeline et attend les enfants.
 ** ============================================================================
 */
-static int	run_and_wait(t_cmd *cmd, char **env, t_exec *ex)
+static int	run_and_wait(t_cmd *cmd, char **env, t_exec *ex, t_token *tokens)
 {
 	pid_t	pid;
 	int		status;
@@ -115,7 +119,7 @@ static int	run_and_wait(t_cmd *cmd, char **env, t_exec *ex)
 	set_signals_for_exec();
 	ex->in_fd = STDIN_FILENO;
 	ex->idx = 0;
-	pid = run_pipeline(cmd, env, ex);
+	pid = run_pipeline(cmd, env, ex, tokens);
 	free(ex->hd_fds);
 	if (pid == -1)
 		return (init_signals(), 1);
@@ -137,7 +141,7 @@ static int	run_and_wait(t_cmd *cmd, char **env, t_exec *ex)
 **      de sortie du dernier via wait_children().
 ** ============================================================================
 */
-int	execute(t_cmd *cmd, char ***env)
+int	execute(t_cmd *cmd, char ***env, t_token *tokens)
 {
 	t_exec	ex;
 	int		hd_ret;
@@ -162,5 +166,5 @@ int	execute(t_cmd *cmd, char ***env)
 		free(ex.hd_fds);
 		return (status);
 	}
-	return (run_and_wait(cmd, *env, &ex));
+	return (run_and_wait(cmd, *env, &ex, tokens));
 }

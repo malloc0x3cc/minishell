@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/11 13:52:13 by ghub              #+#    #+#             */
-/*   Updated: 2026/09/02 22:49:21 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/09 23:57:42 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,32 +90,33 @@ static void	setup_fds(t_fds *fds)
 **   - 126 : Cible est un repertoire ou probleme de permission (non executable).
 ** ============================================================================
 */
-static void	handle_exec_error(char *path, char *cmd_name)
+static void	handle_exec_error(char *path, t_cmd *cmd, t_fds *fds, char **env)
 {
 	struct stat	path_stat;
+	char		*cmd_name;
+	int			code;
 
+	cmd_name = cmd->args[0];
 	ft_putstr_fd("minishell: ", 2);
 	if (!path || !ft_strchr(cmd_name, '/'))
 	{
 		ft_putstr_fd(cmd_name, 2);
 		ft_putendl_fd(": command not found", 2);
-		exit(127);
+		cleanup_child_and_exit(cmd, env, fds, 127);
 	}
 	if (stat(path, &path_stat) == 0 && S_ISDIR(path_stat.st_mode))
 	{
 		ft_putstr_fd(path, 2);
 		ft_putendl_fd(": Is a directory", 2);
 		free(path);
-		exit(126);
+		cleanup_child_and_exit(cmd, env, fds, 126);
 	}
 	perror(path);
+	code = 126;
 	if (access(path, F_OK) != 0)
-	{
-		free(path);
-		exit(127);
-	}
+		code = 127;
 	free(path);
-	exit(126);
+	cleanup_child_and_exit(cmd, env, fds, code);
 }
 
 /*
@@ -141,24 +142,28 @@ static void	handle_exec_error(char *path, char *cmd_name)
 ** avec exit(127) (convention shell).
 ** ============================================================================
 */
-static void	exec_cmd(t_cmd *cmd, char **env)
+static void	exec_cmd(t_cmd *cmd, t_fds *fds, char **env)
 {
 	char	*path;
+	int		status;
 
 	if (apply_redirs(cmd->redirs) != 0)
-		exit(1);
+		cleanup_child_and_exit(cmd, env, fds, 1);
 	if (!cmd->args || !cmd->args[0] || !cmd->args[0][0])
-		exit(0);
+		cleanup_child_and_exit(cmd, env, fds, 0);
 	if (is_builtin(cmd->args[0]))
-		exit(exec_builtin(cmd, &env));
+	{
+		status = exec_builtin(cmd, &env);
+		cleanup_child_and_exit(cmd, env, fds, status);
+	}
 	path = find_path(cmd->args[0], env);
 	if (!path || ft_strchr(cmd->args[0], '/'))
 	{
 		if (!path || access(path, F_OK) != 0)
-			handle_exec_error(path, cmd->args[0]);
+			handle_exec_error(path, cmd, fds, env);
 	}
 	execve(path, cmd->args, env);
-	handle_exec_error(path, cmd->args[0]);
+	handle_exec_error(path, cmd, fds, env);
 }
 
 /*
@@ -183,5 +188,5 @@ void	child_exec(t_cmd *cmd, t_fds *fds, char **env)
 {
 	reset_signals_for_child();
 	setup_fds(fds);
-	exec_cmd(cmd, env);
+	exec_cmd(cmd, fds, env);
 }

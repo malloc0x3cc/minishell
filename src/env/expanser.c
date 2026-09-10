@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/16 12:05:14 by madelwau          #+#    #+#             */
-/*   Updated: 2026/09/02 08:17:56 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/09 23:30:54 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,17 +194,23 @@ void	expanser(t_token *tokens, char **env, int last_status)
 {
 	t_token	*tmp;
 	char	*old_str;
+	char	*expanded;
 	size_t	new_len;
 
 	tmp = tokens;
 	while (tmp)
 	{
-		if (tmp->type == TOKEN_WORD)
+		if (tmp->type == TOKEN_WORD && tmp->str)
 		{
 			new_len = get_expanded_len(tmp->str, env, last_status);
-			old_str = tmp->str;
-			tmp->str = substitute_variables(old_str, new_len, env, last_status);
-			free(old_str);
+			expanded = substitute_variables(tmp->str,
+					new_len, env, last_status);
+			if (expanded)
+			{
+				old_str = tmp->str;
+				tmp->str = expanded;
+				free(old_str);
+			}
 		}
 		tmp = tmp->next;
 	}

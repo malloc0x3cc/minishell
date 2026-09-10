@@ -6,7 +6,7 @@
 #    By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/06/04 12:58:29 by madelwau          #+#    #+#              #
-#    Updated: 2026/09/09 10:59:02 by madelwau         ###   ########.fr        #
+#    Updated: 2026/09/10 00:01:24 by madelwau         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -61,8 +61,11 @@ fclean: clean
 
 re: fclean all
 
-val: all
-	@valgrind --suppressions=readline.supp --leak-check=full --show-leak-kinds=all --child-silent-after-fork=yes ./$(NAME)
+valgrind: all
+	@valgrind --suppressions=readline.supp --leak-check=full --show-leak-kinds=all ./$(NAME)
+
+funcheck: all
+	@funcheck ./$(NAME)
 
 .PHONY: all clean fclean re val
 -include $(DEPS)

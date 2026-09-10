@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/10 11:07:22 by madelwau          #+#    #+#             */
-/*   Updated: 2026/09/02 19:39:32 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/10 00:07:51 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,25 +58,6 @@ static t_token_type	handle_redir(char *input)
 	return (TOKEN_PIPE);
 }
 
-static int	check_redir_syntax(char *s)
-{
-	int		count;
-	char	c;
-
-	c = *s;
-	count = 0;
-	while (s[count] == c)
-		count++;
-	if (count > 2 || (c == '|' && count > 1))
-	{
-		ft_putstr_fd("minishell: syntax error near unexpected token `", 2);
-		ft_putchar_fd(c, 2);
-		ft_putendl_fd("'", 2);
-		return (-1);
-	}
-	return (count);
-}
-
 /*
 ** ============================================================================
 ** handle_args
@@ -118,6 +99,20 @@ static char	*handle_args(char **input)
 	return (ft_substr(start, 0, word_len));
 }
 
+static int	add_redir_token(t_token **t, char **s)
+{
+	int				len;
+	t_token_type	type;
+
+	len = check_redir_syntax(*s);
+	if (len == -1)
+		return (-1);
+	type = handle_redir(*s);
+	add_token(t, create_token(ft_strndup(*s, len), type));
+	*s += len;
+	return (0);
+}
+
 /*
 ** ============================================================================
 ** lexer
@@ -138,9 +133,8 @@ static char	*handle_args(char **input)
 */
 t_token	*lexer(char *s)
 {
-	t_token			*t;
-	t_token_type	type;
-	int				len;
+	t_token	*t;
+	char	*arg;
 
 	t = NULL;
 	while (*s)
@@ -149,17 +143,15 @@ t_token	*lexer(char *s)
 			s++;
 		if (!*s)
 			break ;
-		if (is_redir(*s))
+		if (is_redir(*s) && add_redir_token(&t, &s) == -1)
+			return (free_tokens(t), NULL);
+		else if (!is_redir(*s))
 		{
-			len = check_redir_syntax(s);
-			if (len == -1)
+			arg = handle_args(&s);
+			if (!arg)
 				return (free_tokens(t), NULL);
-			type = handle_redir(s);
-			add_token(&t, create_token(ft_strndup(s, len), type));
-			s += len;
+			add_token(&t, create_token(arg, TOKEN_WORD));
 		}
-		else
-			add_token(&t, create_token(handle_args(&s), TOKEN_WORD));
 	}
 	return (t);
 }

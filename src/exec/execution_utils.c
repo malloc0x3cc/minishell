@@ -6,11 +6,24 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/07 15:48:58 by ghub              #+#    #+#             */
-/*   Updated: 2026/09/02 20:23:18 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/09 23:54:41 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+void	cleanup_child_and_exit(t_cmd *cmd, char **env, t_fds *fds, int status)
+{
+	if (fds)
+	{
+		free(fds->hd_fds_all);
+		free_tokens(fds->tokens);
+	}
+	free_cmds(cmd);
+	free_env(env);
+	rl_clear_history();
+	exit(status);
+}
 
 /*
 ** ============================================================================

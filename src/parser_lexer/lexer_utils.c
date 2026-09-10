@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/15 16:36:21 by madelwau          #+#    #+#             */
-/*   Updated: 2026/07/16 14:10:16 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/10 00:08:07 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,7 @@ t_token	*create_token(char *str, t_token_type type)
 
 	new = malloc(sizeof(t_token));
 	if (!new)
-		return (NULL);
+		return (free(str), NULL);
 	new->str = str;
 	new->type = type;
 	new->next = NULL;
@@ -133,4 +133,23 @@ void	add_token(t_token **head, t_token *new)
 	while (tmp->next)
 		tmp = tmp->next;
 	tmp->next = new;
+}
+
+int	check_redir_syntax(char *s)
+{
+	int		count;
+	char	c;
+
+	c = *s;
+	count = 0;
+	while (s[count] == c)
+		count++;
+	if (count > 2 || (c == '|' && count > 1))
+	{
+		ft_putstr_fd("minishell: syntax error near unexpected token `", 2);
+		ft_putchar_fd(c, 2);
+		ft_putendl_fd("'", 2);
+		return (-1);
+	}
+	return (count);
 }

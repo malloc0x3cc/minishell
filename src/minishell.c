@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:00:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/09/03 07:44:20 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/09 23:54:12 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,8 @@ static char	*clean_str(char *str)
 	int		i;
 	int		j;
 
+	if (!str)
+		return (NULL);
 	clean = malloc(sizeof(char) * (ft_strlen(str) + 1));
 	if (!clean)
 		return (NULL);
@@ -72,15 +74,20 @@ static void	remove_quotes(t_token *tokens)
 {
 	t_token	*tmp;
 	char	*old_str;
+	char	*cleaned;
 
 	tmp = tokens;
 	while (tmp)
 	{
-		if (tmp->type == TOKEN_WORD)
+		if (tmp->type == TOKEN_WORD && tmp->str)
 		{
-			old_str = tmp->str;
-			tmp->str = clean_str(old_str);
-			free(old_str);
+			cleaned = clean_str(tmp->str);
+			if (cleaned)
+			{
+				old_str = tmp->str;
+				tmp->str = cleaned;
+				free(old_str);
+			}
 		}
 		tmp = tmp->next;
 	}
@@ -159,7 +166,7 @@ static int	shell_loop(char *input, char ***env, int last_status)
 		return (0);
 	cmds = parser(tokens);
 	if (cmds)
-		last_status = execute(cmds, env);
+		last_status = execute(cmds, env, tokens);
 	free_tokens(tokens);
 	free_cmds(cmds);
 	return (last_status);

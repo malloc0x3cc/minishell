@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:01:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/09/03 00:44:13 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/10 00:08:22 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,9 +74,11 @@ typedef struct s_exec
 
 typedef struct s_fds
 {
-	int	in_fd;
-	int	out_fd;
-	int	hd_fd;
+	int		in_fd;
+	int		out_fd;
+	int		hd_fd;
+	int		*hd_fds_all;
+	t_token	*tokens;
 }	t_fds;
 
 typedef struct s_sub_ctx
@@ -95,6 +97,7 @@ void	free_tokens(t_token *t);
 void	free_cmds(t_cmd *cmd);
 t_token	*create_token(char *str, t_token_type type);
 void	add_token(t_token **head, t_token *new);
+int		check_redir_syntax(char *s);
 /* parser */
 t_cmd	*parser(t_token *t);
 int		check_syntax(t_token *t);
@@ -136,13 +139,14 @@ int		builtin_export(char **args, char ***env);
 int		builtin_unset(char **args, char ***env);
 int		builtin_exit(char **args);
 /* execution */
-int		execute(t_cmd *cmd, char ***env);
+int		execute(t_cmd *cmd, char ***env, t_token *tokens);
 int		wait_children(pid_t pid);
 int		count_cmds(t_cmd *cmd);
 void	child_exec(t_cmd *cmd, t_fds *fds, char **env);
 int		handle_heredocs(t_cmd *cmd, int *hd_fds);
 char	*find_path(char *cmd, char **env);
 int		apply_redirs(t_redir *redir);
+void	cleanup_child_and_exit(t_cmd *cmd, char **env, t_fds *fds, int status);
 int		setup_pipe(t_cmd *cmd, t_exec *ex);
 int		exec_empty_cmd_redirs(t_redir *redirs);
 
