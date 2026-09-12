@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:01:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/09/10 00:08:22 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/12 22:26:39 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,67 +90,88 @@ typedef struct s_sub_ctx
 	int		status;
 }	t_sub_ctx;
 
-/* lexer */
-t_token	*lexer(char *s);
-/* lexer_utils */
-void	free_tokens(t_token *t);
-void	free_cmds(t_cmd *cmd);
-t_token	*create_token(char *str, t_token_type type);
-void	add_token(t_token **head, t_token *new);
-int		check_redir_syntax(char *s);
-/* parser */
-t_cmd	*parser(t_token *t);
-int		check_syntax(t_token *t);
-int		is_all_spaces(char *s);
-/* expanser */
-void	expanser(t_token *tokens, char **env, int last_status);
-/* expanser_utils */
-char	*get_env_value(char *var, char **env);
-int		is_var_char(char c);
-size_t	get_var_name_len(char *str);
-void	insert_status_value(char *dest, size_t *j, int last_status);
-size_t	add_var_len(char *str, size_t *i, char **env, int status);
-/* signal */
-void	init_signals(void);
-void	set_signals_for_exec(void);
-void	reset_signals_for_child(void);
-void	set_signals_for_heredoc(void);
-/* signal handlers */
-void	handle_sigint_prompt(int sig);
-void	handle_sigint_exec(int sig);
-void	handle_sigint_heredoc(int sig);
-/* env utils */
+/* Global var for return code */
+extern volatile sig_atomic_t	g_received_signal;
+
+/* src/builtin/ */
+/* builtin_cd.c */
+int		builtin_cd(char **args, char ***env);
+/* builtin_echo_pwd_env.c */
+int		builtin_echo(char **args);
+int		builtin_pwd(void);
+int		builtin_env(char **env);
+/* builtin_exit.c */
+int		builtin_exit(char **args);
+/* builtin_export_unset.c */
+int		builtin_export(char **args, char ***env);
+int		builtin_unset(char **args, char ***env);
+/* builtin_dispatcher.c */
+int		is_parent_builtin(char *cmd);
+int		is_builtin(char *cmd);
+int		exec_builtin(t_cmd *cmd, char ***env);
+
+/* src/env */
+/* env_utils.c */
 int		env_size(char **env);
 void	free_env(char **env);
 char	**dup_env(char **env);
 int		set_env_val(char *key_value, char ***env);
 int		unset_env_val(char *key, char ***env);
-/* builtin dispatcher & execution */
-int		is_parent_builtin(char *cmd);
-int		is_builtin(char *cmd);
-int		exec_builtin(t_cmd *cmd, char ***env);
-int		exec_single_parent_builtin(t_cmd *cmd, char ***env, int hd_fd);
-/* builtins */
-int		builtin_echo(char **args);
-int		builtin_pwd(void);
-int		builtin_env(char **env);
-int		builtin_cd(char **args, char ***env);
-int		builtin_export(char **args, char ***env);
-int		builtin_unset(char **args, char ***env);
-int		builtin_exit(char **args);
-/* execution */
-int		execute(t_cmd *cmd, char ***env, t_token *tokens);
-int		wait_children(pid_t pid);
-int		count_cmds(t_cmd *cmd);
-void	child_exec(t_cmd *cmd, t_fds *fds, char **env);
-int		handle_heredocs(t_cmd *cmd, int *hd_fds);
+/* expanser_utils.c */
+char	*get_env_value(char *var, char **env);
+int		is_var_char(char c);
+size_t	get_var_name_len(char *str);
+void	insert_status_value(char *dest, size_t *j, int last_status);
+size_t	add_var_len(char *str, size_t *i, char **env, int status);
+/* expanser.c */
+void	expanser(t_token *tokens, char **env, int last_status);
+/* find_path.c */
 char	*find_path(char *cmd, char **env);
-int		apply_redirs(t_redir *redir);
+
+/* src/exec */
+/* execution_children.c */
+void	child_exec(t_cmd *cmd, t_fds *fds, char **env);
+/* execution_parent.c */
+int		exec_single_parent_builtin(t_cmd *cmd, char ***env, int hd_fd);
+/* execution_utils.c */
 void	cleanup_child_and_exit(t_cmd *cmd, char **env, t_fds *fds, int status);
+int		count_cmds(t_cmd *cmd);
+int		wait_children(pid_t pid);
 int		setup_pipe(t_cmd *cmd, t_exec *ex);
 int		exec_empty_cmd_redirs(t_redir *redirs);
+/* execution.c */
+int		execute(t_cmd *cmd, char ***env, t_token *tokens);
+/* heredoc.c */
+int		handle_heredocs(t_cmd *cmd, int *hd_fds);
+/* redirection.c */
+int		apply_redirs(t_redir *redir);
 
-/* Return code */
-extern volatile sig_atomic_t	g_received_signal;
+/* src/parser_lexer */
+/* lexer_utils.c */
+void	free_tokens(t_token *t);
+void	free_cmds(t_cmd *cmd);
+t_token	*create_token(char *str, t_token_type type);
+void	add_token(t_token **head, t_token *new);
+int		check_redir_syntax(char *s);
+/* lexer.c */
+t_token	*lexer(char *s);
+/* parser_utils.c */
+int		check_syntax(t_token *t);
+int		is_all_spaces(char *s);
+char	*clean_str(char *str);
+void	remove_quotes(t_token *tokens);
+/* parser.c */
+t_cmd	*parser(t_token *t);
+
+/* src/signal */
+/* signal_handlers.c */
+void	handle_sigint_prompt(int sig);
+void	handle_sigint_exec(int sig);
+void	handle_sigint_heredoc(int sig);
+/* signal.c */
+void	init_signals(void);
+void	set_signals_for_exec(void);
+void	reset_signals_for_child(void);
+void	set_signals_for_heredoc(void);
 
 #endif

@@ -6,92 +6,13 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:00:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/09/12 21:14:18 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/12 22:09:44 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 volatile sig_atomic_t	g_received_signal = 0;
-
-/*
-** ============================================================================
-** clean_str
-** ============================================================================
-** Alloue une nouvelle chaine et y recopie 'str' en retirant les quotes qui
-** ont servi a definir les arguments (quote removal), conformement au
-** comportement classique de Bash.
-**
-** Seuls les quotes exterieurs et effectifs sont supprimes :
-** Un simple quote dans des doubles quotes (ex: "hello 'world'") ou inversement
-** est preserve car il ne sert pas de delimiteur a ce niveau.
-**
-** Retourne la chaine "nettoyee" sans les quotes, ou NULL en cas d'echec.
-** ============================================================================
-*/
-static char	*clean_str(char *str)
-{
-	char	*clean;
-	char	quote;
-	int		i;
-	int		j;
-
-	if (!str)
-		return (NULL);
-	clean = malloc(sizeof(char) * (ft_strlen(str) + 1));
-	if (!clean)
-		return (NULL);
-	quote = '\0';
-	i = 0;
-	j = 0;
-	while (str[i])
-	{
-		if ((str[i] == '\'' || str[i] == '"') && quote == '\0')
-			quote = str[i];
-		else if (str[i] == quote)
-			quote = '\0';
-		else
-			clean[j++] = str[i];
-		i++;
-	}
-	clean[j] = '\0';
-	return (clean);
-}
-
-/*
-** ============================================================================
-** remove_quotes
-** ============================================================================
-** Parcourt toute la liste chainee des tokens et applique l'etape de "Quote
-** Removal" sur chaque TOKEN_WORD.
-**
-** Remplace la chaine originale du token par sa version nettoyee (sans les
-** quotes protecteurs devenus inutiles apres l'expansion) via clean_str(),
-** puis libere proprement l'ancienne chaine de caracteres.
-** ============================================================================
-*/
-static void	remove_quotes(t_token *tokens)
-{
-	t_token	*tmp;
-	char	*old_str;
-	char	*cleaned;
-
-	tmp = tokens;
-	while (tmp)
-	{
-		if (tmp->type == TOKEN_WORD && tmp->str)
-		{
-			cleaned = clean_str(tmp->str);
-			if (cleaned)
-			{
-				old_str = tmp->str;
-				tmp->str = cleaned;
-				free(old_str);
-			}
-		}
-		tmp = tmp->next;
-	}
-}
 
 /*
 ** ============================================================================
@@ -172,6 +93,13 @@ static int	shell_loop(char *input, char ***env, int last_status)
 	return (last_status);
 }
 
+static char	*get_input(void)
+{
+	if (isatty(STDIN_FILENO))
+		return (readline(PROMPT));
+	return (readline(NULL));
+}
+
 /*
 ** ============================================================================
 ** main
@@ -197,7 +125,7 @@ int	main(int ac, char **av, char **envp)
 	char	**my_env;
 	int		last_status;
 
-	(void)((void)ac, (void)av);
+	((void)ac, (void)av);
 	my_env = dup_env(envp);
 	if (!my_env)
 		return (1);
@@ -207,8 +135,7 @@ int	main(int ac, char **av, char **envp)
 	while (last_status >= 0)
 	{
 		g_received_signal = 0;
-		if (isatty(STDIN_FILENO))
-			input = readline(PROMPT);
+		input = get_input();
 		if (!input)
 			break ;
 		if (*input)
