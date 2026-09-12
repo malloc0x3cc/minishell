@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
+/*   By: gahubert <gahubert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:00:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/09/09 23:54:12 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/12 20:50:06 by gahubert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -203,11 +203,13 @@ int	main(int ac, char **av, char **envp)
 		return (1);
 	init_signals();
 	last_status = 0;
+	rl_outstream = stderr;
 	while (last_status >= 0)
 	{
 		g_received_signal = 0;
-		input = readline(PROMPT);
-		if (!input)
+		if (isatty(STDIN_FILENO))
+			input = readline(PROMPT);
+		if (!input)	
 			break ;
 		if (*input)
 			last_status = shell_loop(input, &my_env, last_status);
