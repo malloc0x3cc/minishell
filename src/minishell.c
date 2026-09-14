@@ -6,7 +6,7 @@
 /*   By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/04 13:00:08 by madelwau          #+#    #+#             */
-/*   Updated: 2026/09/12 22:09:44 by madelwau         ###   ########.fr       */
+/*   Updated: 2026/09/12 22:51:38 by madelwau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,10 +93,15 @@ static int	shell_loop(char *input, char ***env, int last_status)
 	return (last_status);
 }
 
+static void	dummy_redisplay(void)
+{
+}
+
 static char	*get_input(void)
 {
 	if (isatty(STDIN_FILENO))
 		return (readline(PROMPT));
+	rl_redisplay_function = dummy_redisplay;
 	return (readline(NULL));
 }
 

@@ -61,13 +61,16 @@ fclean: clean
 
 re: fclean all
 
+debug: CFLAGS += -g3 -O0
+debug: re
+
 valgrind: all
 	@valgrind --suppressions=readline.supp --leak-check=full --show-leak-kinds=all ./$(NAME)
 
 funcheck: all
 	@funcheck ./$(NAME)
 
-.PHONY: all clean fclean re val
+.PHONY: all clean fclean re debug valgrind funcheck
 -include $(DEPS)
 
 # Colors
