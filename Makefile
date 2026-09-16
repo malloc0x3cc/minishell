@@ -6,13 +6,13 @@
 #    By: madelwau <madelwau@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/06/04 12:58:29 by madelwau          #+#    #+#              #
-#    Updated: 2026/09/10 00:01:24 by madelwau         ###   ########.fr        #
+#    Updated: 2026/09/15 15:18:22 by madelwau         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 SHELL	:=	/bin/sh
 
-NAME	:= $(strip minishell)
+NAME	:= minishell
 
 CC		:= cc
 CFLAGS	:= -Wall -Wextra -Werror -Iinc -MMD -MP
@@ -64,10 +64,10 @@ re: fclean all
 debug: CFLAGS += -g3 -O0
 debug: re
 
-valgrind: all
+valgrind: debug
 	@valgrind --suppressions=readline.supp --leak-check=full --show-leak-kinds=all ./$(NAME)
 
-funcheck: all
+funcheck: debug
 	@funcheck ./$(NAME)
 
 .PHONY: all clean fclean re debug valgrind funcheck
