@@ -61,4 +61,4 @@ Ressources
 
 Ai Usage
 --------
-AI was used during this project to speed up documentation research and to shorted functions.
+AI was used during this project to speed up documentation research.
