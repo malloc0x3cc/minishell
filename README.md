@@ -57,5 +57,7 @@ Once compilation completes successfully, launch the shell interface directly fro
 
 Ressources
 ----------
+- [Introduction to Systems Programming: a Hands-on Approach](https://www.cs.purdue.edu/homes/grr/SystemsProgrammingBook/Book/Chapter5-WritingYourOwnShell.pdf)
 Ai Usage
 --------
+AI was used during this project to speed up documentation research and to shorted functions.
